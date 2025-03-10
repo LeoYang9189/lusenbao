@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>运价维护 - 运价报价管理系统</title>
+    <style>
+        /* 复用基础样式 */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+        .navbar {
+            background: #001529;
+            padding: 0 20px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            color: white;
+        }
+        .navbar h1 {
+            margin: 0;
+            font-size: 18px;
+        }
+        .container {
+            display: flex;
+            min-height: calc(100vh - 50px);
+        }
+        .sidebar {
+            width: 200px;
+            background: #001529;
+            padding: 20px 0;
+        }
+        .menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .menu li {
+            padding: 10px 20px;
+        }
+        .menu a {
+            color: #fff;
+            text-decoration: none;
+            display: block;
+        }
+        .menu a:hover {
+            color: #1890ff;
+        }
+        .content {
+            flex: 1;
+            padding: 20px;
+            background: #f0f2f5;
+        }
+
+        /* 页面特定样式 */
+        .notice {
+            background: #e6f7ff;
+            border: 1px solid #91d5ff;
+            padding: 12px 24px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        
+        .search-bar {
+            background: #fff;
+            padding: 16px;
+            margin-bottom: 16px;
+            border-radius: 4px;
+        }
+        
+        .search-form {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+        
+        .form-group {
+            display: flex;
+            align-items: center;
+        }
+        
+        .form-group label {
+            width: 80px;
+            margin-right: 8px;
+        }
+        
+        .form-group input {
+            flex: 1;
+            padding: 6px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+        }
+        
+        .button-group {
+            margin: 16px 0;
+        }
+        
+        .button {
+            background: #1890ff;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 8px;
+        }
+        
+        .button.secondary {
+            background: #fff;
+            color: #1890ff;
+            border: 1px solid #1890ff;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+            border-radius: 4px;
+        }
+        
+        .data-table th,
+        .data-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .data-table th {
+            background: #fafafa;
+            font-weight: 500;
+        }
+        
+        .action-link {
+            color: #1890ff;
+            margin-right: 10px;
+            text-decoration: none;
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+            align-items: center;
+        }
+        
+        .pagination button {
+            background: #fff;
+            border: 1px solid #d9d9d9;
+            padding: 5px 10px;
+            margin: 0 4px;
+            cursor: pointer;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h1>运价报价管理系统 - 运价维护</h1>
+    </div>
+    <div class="container">
+        <div class="sidebar">
+            <ul class="menu">
+                <li><a href="basic-data.html">基础资料管理</a></li>
+                <li><a href="freight-maintenance.html">运价维护</a></li>
+                <li><a href="freight-query.html">运价查询</a></li>
+                <li><a href="quotation.html">报价管理</a></li>
+            </ul>
+        </div>
+        <div class="content">
+            <!-- 公告 -->
+            <div class="notice">
+                以下内容为改造Cargoware运价管理模块，单独拿出来放在方案中是为了方便展示
+            </div>
+
+            <!-- 搜索栏 -->
+            <div class="search-bar">
+                <div class="search-form">
+                    <div class="form-group">
+                        <label>运价编号</label>
+                        <input type="text" placeholder="请输入运价编号">
+                    </div>
+                    <div class="form-group">
+                        <label>起点</label>
+                        <input type="text" placeholder="请输入起点">
+                    </div>
+                    <div class="form-group">
+                        <label>终点</label>
+                        <input type="text" placeholder="请输入终点">
+                    </div>
+                    <div class="form-group">
+                        <label>代理名称</label>
+                        <input type="text" placeholder="请输入代理名称">
+                    </div>
+                    <div class="form-group">
+                        <label>有效期</label>
+                        <input type="date">
+                    </div>
+                </div>
+                <div style="text-align: right; margin-top: 16px;">
+                    <button class="button">搜索</button>
+                    <button class="button secondary">重置</button>
+                </div>
+            </div>
+
+            <!-- 按钮组 -->
+            <div class="button-group">
+                <button class="button" onclick="window.location.href='add-freight.html'">新增运价</button>
+                <button class="button secondary">Excel导入</button>
+            </div>
+
+            <!-- 数据表格 -->
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>运价编号</th>
+                        <th>起点</th>
+                        <th>终点</th>
+                        <th>代理名称</th>
+                        <th>有效期</th>
+                        <th>创建人</th>
+                        <th>创建时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>FR2024030001</td>
+                        <td>上海</td>
+                        <td>东京</td>
+                        <td>上海航运代理有限公司</td>
+                        <td>2024-12-31</td>
+                        <td>张三</td>
+                        <td>2024-03-01 10:00:00</td>
+                        <td>
+                            <a href="edit-freight.html?id=1" class="action-link">编辑</a>
+                            <a href="javascript:void(0)" class="action-link" onclick="deleteItem(1)">删除</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>FR2024030002</td>
+                        <td>宁波</td>
+                        <td>大阪</td>
+                        <td>宁波国际物流有限公司</td>
+                        <td>2024-12-31</td>
+                        <td>李四</td>
+                        <td>2024-03-01 11:30:00</td>
+                        <td>
+                            <a href="edit-freight.html?id=2" class="action-link">编辑</a>
+                            <a href="javascript:void(0)" class="action-link" onclick="deleteItem(2)">删除</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- 分页器 -->
+            <div class="pagination">
+                <button>1</button>
+                <button>2</button>
+                <button>3</button>
+                <span>...</span>
+                <button>10</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 定义虚拟数据
+        const mockData = [
+            {
+                id: 1,
+                freightNo: 'FR202403001',
+                startPoint: '上海',
+                endPoint: '东京',
+                agentName: '上海航运代理有限公司',
+                validPeriod: '2024-03-01 至 2024-12-31',
+                creator: '张三',
+                createTime: '2024-03-01 10:00:00'
+            },
+            {
+                id: 2,
+                freightNo: 'FR202403002',
+                startPoint: '宁波',
+                endPoint: '大阪',
+                agentName: '宁波国际物流有限公司',
+                validPeriod: '2024-03-01 至 2024-12-31',
+                creator: '李四',
+                createTime: '2024-03-01 11:30:00'
+            },
+            {
+                id: 3,
+                freightNo: 'FR202403003',
+                startPoint: '青岛',
+                endPoint: '神户',
+                agentName: '青岛海运物流有限公司',
+                validPeriod: '2024-03-01 至 2024-09-30',
+                creator: '王五',
+                createTime: '2024-03-01 14:20:00'
+            },
+            {
+                id: 4,
+                freightNo: 'FR202403004',
+                startPoint: '天津',
+                endPoint: '横滨',
+                agentName: '天津港口物流公司',
+                validPeriod: '2024-03-01 至 2024-06-30',
+                creator: '赵六',
+                createTime: '2024-03-01 15:45:00'
+            },
+            {
+                id: 5,
+                freightNo: 'FR202403005',
+                startPoint: '大连',
+                endPoint: '名古屋',
+                agentName: '大连海事物流有限公司',
+                validPeriod: '2024-03-01 至 2024-08-31',
+                creator: '孙七',
+                createTime: '2024-03-01 16:30:00'
+            },
+            {
+                id: 6,
+                freightNo: 'FR202403006',
+                startPoint: '厦门',
+                endPoint: '福冈',
+                agentName: '厦门国际货运代理',
+                validPeriod: '2024-03-01 至 2024-12-31',
+                creator: '周八',
+                createTime: '2024-03-02 09:15:00'
+            },
+            {
+                id: 7,
+                freightNo: 'FR202403007',
+                startPoint: '广州',
+                endPoint: '神戸',
+                agentName: '广州海运集团',
+                validPeriod: '2024-03-01 至 2024-11-30',
+                creator: '吴九',
+                createTime: '2024-03-02 10:20:00'
+            },
+            {
+                id: 8,
+                freightNo: 'FR202403008',
+                startPoint: '深圳',
+                endPoint: '大阪',
+                agentName: '深圳港务集团',
+                validPeriod: '2024-03-01 至 2024-10-31',
+                creator: '郑十',
+                createTime: '2024-03-02 11:40:00'
+            }
+        ];
+
+        window.onload = function() {
+            // 获取表格体
+            const tbody = document.querySelector('.data-table tbody');
+            
+            // 清空现有数据
+            tbody.innerHTML = '';
+            
+            // 添加所有虚拟记录
+            mockData.forEach(record => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${record.id}</td>
+                        <td>${record.freightNo}</td>
+                        <td>${record.startPoint}</td>
+                        <td>${record.endPoint}</td>
+                        <td>${record.agentName}</td>
+                        <td>${record.validPeriod}</td>
+                        <td>${record.creator}</td>
+                        <td>${record.createTime}</td>
+                        <td>
+                            <a href="edit-freight.html?id=${record.id}" class="action-link">编辑</a>
+                            <a href="javascript:void(0)" class="action-link" onclick="deleteItem(${record.id})">删除</a>
+                        </td>
+                    </tr>
+                `;
+            });
+        };
+
+        function deleteItem(id) {
+            if (confirm('确定要删除这条运价记录吗？')) {
+                alert('删除成功！');
+                // 仅从页面上移除该行
+                const row = document.querySelector(`tr[data-id="${id}"]`);
+                if (row) {
+                    row.remove();
+                }
+            }
+        }
+    </script>
+</body>
+</html> 

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>运价报价管理系统</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+        .navbar {
+            background: #001529;
+            padding: 0 20px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            color: white;
+        }
+        .navbar h1 {
+            margin: 0;
+            font-size: 18px;
+        }
+        .container {
+            display: flex;
+            min-height: calc(100vh - 50px);
+        }
+        .sidebar {
+            width: 200px;
+            background: #001529;
+            padding: 20px 0;
+        }
+        .menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .menu li {
+            padding: 10px 20px;
+        }
+        .menu a {
+            color: #fff;
+            text-decoration: none;
+            display: block;
+        }
+        .menu a:hover {
+            color: #1890ff;
+        }
+        .content {
+            flex: 1;
+            padding: 20px;
+            background: #f0f2f5;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h1>运价报价管理系统</h1>
+    </div>
+    <div class="container">
+        <div class="sidebar">
+            <ul class="menu">
+                <li><a href="basic-data.html">基础资料管理</a></li>
+                <li><a href="freight-maintenance.html">运价维护</a></li>
+                <li><a href="freight-query.html">运价查询</a></li>
+                <li><a href="quotation.html">报价管理</a></li>
+            </ul>
+        </div>
+        <div class="content">
+            <h2>欢迎使用运价报价管理系统</h2>
+        </div>
+    </div>
+</body>
+</html> 

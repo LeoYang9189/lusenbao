@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>基础资料管理 - 运价报价管理系统</title>
+    <style>
+        /* 复用 index.html 的基础样式 */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+        .navbar {
+            background: #001529;
+            padding: 0 20px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            color: white;
+        }
+        .navbar h1 {
+            margin: 0;
+            font-size: 18px;
+        }
+        .container {
+            display: flex;
+            min-height: calc(100vh - 50px);
+        }
+        .sidebar {
+            width: 200px;
+            background: #001529;
+            padding: 20px 0;
+        }
+        .menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .menu li {
+            padding: 10px 20px;
+        }
+        .menu a {
+            color: #fff;
+            text-decoration: none;
+            display: block;
+        }
+        .menu a:hover {
+            color: #1890ff;
+        }
+        .content {
+            flex: 1;
+            padding: 20px;
+            background: #f0f2f5;
+        }
+
+        /* 新增样式 */
+        .notice {
+            background: #e6f7ff;
+            border: 1px solid #91d5ff;
+            padding: 12px 24px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        
+        .tabs {
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        
+        .tab-item {
+            display: inline-block;
+            padding: 10px 20px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            margin-bottom: -1px;
+        }
+        
+        .tab-item.active {
+            border: 1px solid #ddd;
+            border-bottom-color: #fff;
+            background: #fff;
+        }
+        
+        .search-bar {
+            background: #fff;
+            padding: 16px;
+            margin-bottom: 16px;
+            border-radius: 4px;
+        }
+        
+        .button {
+            background: #1890ff;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+            border-radius: 4px;
+        }
+        
+        .data-table th,
+        .data-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .data-table th {
+            background: #fafafa;
+            font-weight: 500;
+        }
+        
+        .action-link {
+            color: #1890ff;
+            margin-right: 10px;
+            text-decoration: none;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+
+        /* 分页器样式 */
+        .pagination {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+            align-items: center;
+        }
+        
+        .pagination button {
+            background: #fff;
+            border: 1px solid #d9d9d9;
+            padding: 5px 10px;
+            margin: 0 4px;
+            cursor: pointer;
+            border-radius: 2px;
+        }
+        
+        .pagination button:hover {
+            border-color: #1890ff;
+            color: #1890ff;
+        }
+        
+        .pagination button.active {
+            background: #1890ff;
+            color: #fff;
+            border-color: #1890ff;
+        }
+        
+        /* 模态框样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+        }
+        
+        .modal-content {
+            position: relative;
+            background: #fff;
+            width: 500px;
+            margin: 100px auto;
+            padding: 20px;
+            border-radius: 4px;
+        }
+        
+        .modal-header {
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .modal-close {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            cursor: pointer;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        
+        .modal-footer {
+            margin-top: 20px;
+            text-align: right;
+        }
+        
+        .modal-footer button {
+            margin-left: 10px;
+        }
+
+        /* 下拉框样式 */
+        select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            background-color: white;
+            box-sizing: border-box;
+        }
+        
+        select:focus {
+            outline: none;
+            border-color: #1890ff;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h1>运价报价管理系统 - 基础资料管理</h1>
+    </div>
+    <div class="container">
+        <div class="sidebar">
+            <ul class="menu">
+                <li><a href="basic-data.html">基础资料管理</a></li>
+                <li><a href="freight-maintenance.html">运价维护</a></li>
+                <li><a href="freight-query.html">运价查询</a></li>
+                <li><a href="quotation.html">报价管理</a></li>
+            </ul>
+        </div>
+        <div class="content">
+            <!-- 公告 -->
+            <div class="notice">
+                以下内容为改造Cargoware基础资料库，单独拿出来放在方案中是为了方便展示
+            </div>
+
+            <!-- Tab切换 -->
+            <div class="tabs">
+                <div class="tab-item active" onclick="switchTab('fee-name')">费用名称</div>
+                <div class="tab-item" onclick="switchTab('fee-group')">费用组</div>
+                <div class="tab-item" onclick="switchTab('billing-unit')">计费单位</div>
+                <div class="tab-item" onclick="switchTab('vehicle-type')">车型</div>
+            </div>
+
+            <!-- 费用名称 -->
+            <div id="fee-name" class="tab-content active">
+                <div class="search-bar">
+                    <input type="text" placeholder="搜索费用名称">
+                    <button class="button">搜索</button>
+                </div>
+                <button class="button" style="margin-bottom: 16px;" onclick="openEditModal()">新建费用名称</button>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>中文名</th>
+                            <th>英文名</th>
+                            <th>日文名</th>
+                            <th>计费单位</th>
+                            <th>归属费用组</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>海运费</td>
+                            <td>Ocean Freight</td>
+                            <td>海上運賃</td>
+                            <td>CBM</td>
+                            <td>海运相关费用</td>
+                            <td>
+                                <a href="javascript:void(0)" class="action-link" onclick="openEditModal(1)">编辑</a>
+                                <a href="javascript:void(0)" class="action-link" onclick="deleteItem(1)">删除</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>THC</td>
+                            <td>Terminal Handling Charge</td>
+                            <td>ターミナルハンドリングチャージ</td>
+                            <td>CBM</td>
+                            <td>港口相关费用</td>
+                            <td>
+                                <a href="javascript:void(0)" class="action-link" onclick="openEditModal(2)">编辑</a>
+                                <a href="javascript:void(0)" class="action-link" onclick="deleteItem(2)">删除</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>报关费</td>
+                            <td>Customs Clearance Fee</td>
+                            <td>通関料</td>
+                            <td>票</td>
+                            <td>报关相关费用</td>
+                            <td>
+                                <a href="javascript:void(0)" class="action-link" onclick="openEditModal(3)">编辑</a>
+                                <a href="javascript:void(0)" class="action-link" onclick="deleteItem(3)">删除</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>进仓费</td>
+                            <td>Warehouse Entry Fee</td>
+                            <td>入庫料</td>
+                            <td>CBM</td>
+                            <td>仓储相关费用</td>
+                            <td>
+                                <a href="javascript:void(0)" class="action-link" onclick="openEditModal(4)">编辑</a>
+                                <a href="javascript:void(0)" class="action-link" onclick="deleteItem(4)">删除</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td>文件费</td>
+                            <td>Documentation Fee</td>
+                            <td>書類作成料</td>
+                            <td>票</td>
+                            <td>海运相关费用</td>
+                            <td>
+                                <a href="javascript:void(0)" class="action-link" onclick="openEditModal(5)">编辑</a>
+                                <a href="javascript:void(0)" class="action-link" onclick="deleteItem(5)">删除</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>6</td>
+                            <td>舱单费</td>
+                            <td>Manifest Fee</td>
+                            <td>マニフェスト料</td>
+                            <td>票</td>
+                            <td>海运相关费用</td>
+                            <td>
+                                <a href="javascript:void(0)" class="action-link" onclick="openEditModal(6)">编辑</a>
+                                <a href="javascript:void(0)" class="action-link" onclick="deleteItem(6)">删除</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>7</td>
+                            <td>联单费</td>
+                            <td>B/L Fee</td>
+                            <td>B/L発行料</td>
+                            <td>票</td>
+                            <td>海运相关费用</td>
+                            <td>
+                                <a href="javascript:void(0)" class="action-link" onclick="openEditModal(7)">编辑</a>
+                                <a href="javascript:void(0)" class="action-link" onclick="deleteItem(7)">删除</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>8</td>
+                            <td>报检费</td>
+                            <td>Inspection Fee</td>
+                            <td>検査料</td>
+                            <td>票</td>
+                            <td>报关相关费用</td>
+                            <td>
+                                <a href="javascript:void(0)" class="action-link" onclick="openEditModal(8)">编辑</a>
+                                <a href="javascript:void(0)" class="action-link" onclick="deleteItem(8)">删除</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="pagination">
+                    <button onclick="changePage(1)">1</button>
+                    <button onclick="changePage(2)">2</button>
+                    <button onclick="changePage(3)">3</button>
+                    <span>...</span>
+                    <button onclick="changePage(10)">10</button>
+                </div>
+            </div>
+
+            <!-- 费用组 -->
+            <div id="fee-group" class="tab-content">
+                <div class="search-bar">
+                    <input type="text" placeholder="搜索费用组">
+                    <button class="button">搜索</button>
+                </div>
+                <button class="button" style="margin-bottom: 16px;" onclick="openEditModal()">新建费用组</button>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>中文名</th>
+                            <th>英文名</th>
+                            <th>日文名</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>中国侧海运出口费用</td>
+                            <td>China Ocean Export Fee</td>
+                            <td>中国側海運輸出費用</td>
+                            <td>
+                                <a href="javascript:void(0)" class="action-link" onclick="openEditModal(1)">编辑</a>
+                                <a href="javascript:void(0)" class="action-link" onclick="deleteItem(1)">删除</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>中国侧海运进口费用</td>
+                            <td>China Ocean Import Fee</td>
+                            <td>中国側海運輸入費用</td>
+                            <td>
+                                <a href="javascript:void(0)" class="action-link" onclick="openEditModal(2)">编辑</a>
+                                <a href="javascript:void(0)" class="action-link" onclick="deleteItem(2)">删除</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>日本侧海运出口费用</td>
+                            <td>Japan Ocean Export Fee</td>
+                            <td>日本側海運輸出費用</td>
+                            <td>
+                                <a href="javascript:void(0)" class="action-link" onclick="openEditModal(3)">编辑</a>
+                                <a href="javascript:void(0)" class="action-link" onclick="deleteItem(3)">删除</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>日本侧海运进口费用</td>
+                            <td>Japan Ocean Import Fee</td>
+                            <td>日本側海運輸入費用</td>
+                            <td>
+                                <a href="javascript:void(0)" class="action-link" onclick="openEditModal(4)">编辑</a>
+                                <a href="javascript:void(0)" class="action-link" onclick="deleteItem(4)">删除</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td>海运相关费用</td>
+                            <td>Ocean Freight Related</td>
+                            <td>海運関連費用</td>
+                            <td>
+                                <a href="javascript:void(0)" class="action-link" onclick="openEditModal(5)">编辑</a>
+                                <a href="javascript:void(0)" class="action-link" onclick="deleteItem(5)">删除</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>6</td>
+                            <td>空运相关费用</td>
+                            <td>Air Freight Related</td>
+                            <td>航空運送関連費用</td>
+                            <td>
+                                <a href="javascript:void(0)" class="action-link" onclick="openEditModal(6)">编辑</a>
+                                <a href="javascript:void(0)" class="action-link" onclick="deleteItem(6)">删除</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>7</td>
+                            <td>陆运相关费用</td>
+                            <td>Land Transportation Related</td>
+                            <td>陸上運送関連費用</td>
+                            <td>
+                                <a href="javascript:void(0)" class="action-link" onclick="openEditModal(7)">编辑</a>
+                                <a href="javascript:void(0)" class="action-link" onclick="deleteItem(7)">删除</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>8</td>
+                            <td>铁路运输相关费用</td>
+                            <td>Railway Transportation Related</td>
+                            <td>鉄道輸送関連費用</td>
+                            <td>
+                                <a href="javascript:void(0)" class="action-link" onclick="openEditModal(8)">编辑</a>
+                                <a href="javascript:void(0)" class="action-link" onclick="deleteItem(8)">删除</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>9</td>
+                            <td>内航船运输相关费用</td>
+                            <td>Domestic Shipping Related</td>
+                            <td>内航船輸送関連費用</td>
+                            <td>
+                                <a href="javascript:void(0)" class="action-link" onclick="openEditModal(9)">编辑</a>
+                                <a href="javascript:void(0)" class="action-link" onclick="deleteItem(9)">删除</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>10</td>
+                            <td>保险费用</td>
+                            <td>Insurance Fee</td>
+                            <td>保険料</td>
+                            <td>
+                                <a href="javascript:void(0)" class="action-link" onclick="openEditModal(10)">编辑</a>
+                                <a href="javascript:void(0)" class="action-link" onclick="deleteItem(10)">删除</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>11</td>
+                            <td>搬运相关费用</td>
+                            <td>Handling Related</td>
+                            <td>荷役関連費用</td>
+                            <td>
+                                <a href="javascript:void(0)" class="action-link" onclick="openEditModal(11)">编辑</a>
+                                <a href="javascript:void(0)" class="action-link" onclick="deleteItem(11)">删除</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>12</td>
+                            <td>包装相关费用</td>
+                            <td>Packing Related</td>
+                            <td>包装関連費用</td>
+                            <td>
+                                <a href="javascript:void(0)" class="action-link" onclick="openEditModal(12)">编辑</a>
+                                <a href="javascript:void(0)" class="action-link" onclick="deleteItem(12)">删除</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>13</td>
+                            <td>仓储相关费用</td>
+                            <td>Warehouse Related</td>
+                            <td>倉庫関連費用</td>
+                            <td>
+                                <a href="javascript:void(0)" class="action-link" onclick="openEditModal(13)">编辑</a>
+                                <a href="javascript:void(0)" class="action-link" onclick="deleteItem(13)">删除</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>14</td>
+                            <td>内装相关费用</td>
+                            <td>Interior Work Related</td>
+                            <td>内装関連費用</td>
+                            <td>
+                                <a href="javascript:void(0)" class="action-link" onclick="openEditModal(14)">编辑</a>
+                                <a href="javascript:void(0)" class="action-link" onclick="deleteItem(14)">删除</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>15</td>
+                            <td>保税区相关费用</td>
+                            <td>Bonded Area Related</td>
+                            <td>保税区関連費用</td>
+                            <td>
+                                <a href="javascript:void(0)" class="action-link" onclick="openEditModal(15)">编辑</a>
+                                <a href="javascript:void(0)" class="action-link" onclick="deleteItem(15)">删除</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>16</td>
+                            <td>一日游相关费用</td>
+                            <td>One Day Tour Related</td>
+                            <td>日帰り関連費用</td>
+                            <td>
+                                <a href="javascript:void(0)" class="action-link" onclick="openEditModal(16)">编辑</a>
+                                <a href="javascript:void(0)" class="action-link" onclick="deleteItem(16)">删除</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>17</td>
+                            <td>包材相关费用</td>
+                            <td>Packaging Material Related</td>
+                            <td>包装材関連費用</td>
+                            <td>
+                                <a href="javascript:void(0)" class="action-link" onclick="openEditModal(17)">编辑</a>
+                                <a href="javascript:void(0)" class="action-link" onclick="deleteItem(17)">删除</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="pagination">
+                    <button onclick="changePage(1)">1</button>
+                    <button onclick="changePage(2)">2</button>
+                    <button onclick="changePage(3)">3</button>
+                    <span>...</span>
+                    <button onclick="changePage(10)">10</button>
+                </div>
+            </div>
+
+            <!-- 计费单位 -->
+            <div id="billing-unit" class="tab-content">
+                <div class="search-bar">
+                    <input type="text" placeholder="搜索计费单位">
+                    <button class="button">搜索</button>
+                </div>
+                <button class="button" style="margin-bottom: 16px;" onclick="openEditModal()">新建计费单位</button>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>中文名</th>
+                            <th>英文名</th>
+                            <th>日文名</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>厘米</td>
+                            <td>CM</td>
+                            <td>センチメートル</td>
+                            <td>
+                                <a href="javascript:void(0)" class="action-link" onclick="openEditModal(1)">编辑</a>
+                                <a href="javascript:void(0)" class="action-link" onclick="deleteItem(1)">删除</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>立方米</td>
+                            <td>CBM</td>
+                            <td>立方メートル</td>
+                            <td>
+                                <a href="javascript:void(0)" class="action-link" onclick="openEditModal(2)">编辑</a>
+                                <a href="javascript:void(0)" class="action-link" onclick="deleteItem(2)">删除</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>公斤</td>
+                            <td>KG</td>
+                            <td>キログラム</td>
+                            <td>
+                                <a href="javascript:void(0)" class="action-link" onclick="openEditModal(3)">编辑</a>
+                                <a href="javascript:void(0)" class="action-link" onclick="deleteItem(3)">删除</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>20尺标准箱</td>
+                            <td>20GP</td>
+                            <td>20フィートコンテナ</td>
+                            <td>
+                                <a href="javascript:void(0)" class="action-link" onclick="openEditModal(4)">编辑</a>
+                                <a href="javascript:void(0)" class="action-link" onclick="deleteItem(4)">删除</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td>20尺冷藏箱</td>
+                            <td>20FR</td>
+                            <td>20フィート冷凍コンテナ</td>
+                            <td>
+                                <a href="javascript:void(0)" class="action-link" onclick="openEditModal(5)">编辑</a>
+                                <a href="javascript:void(0)" class="action-link" onclick="deleteItem(5)">删除</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>6</td>
+                            <td>车</td>
+                            <td>Vehicle</td>
+                            <td>車両</td>
+                            <td>
+                                <a href="javascript:void(0)" class="action-link" onclick="openEditModal(6)">编辑</a>
+                                <a href="javascript:void(0)" class="action-link" onclick="deleteItem(6)">删除</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>7</td>
+                            <td>票</td>
+                            <td>Ticket</td>
+                            <td>チケット</td>
+                            <td>
+                                <a href="javascript:void(0)" class="action-link" onclick="openEditModal(7)">编辑</a>
+                                <a href="javascript:void(0)" class="action-link" onclick="deleteItem(7)">删除</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>8</td>
+                            <td>件</td>
+                            <td>Piece</td>
+                            <td>個</td>
+                            <td>
+                                <a href="javascript:void(0)" class="action-link" onclick="openEditModal(8)">编辑</a>
+                                <a href="javascript:void(0)" class="action-link" onclick="deleteItem(8)">删除</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>9</td>
+                            <td>天</td>
+                            <td>Day</td>
+                            <td>日</td>
+                            <td>
+                                <a href="javascript:void(0)" class="action-link" onclick="openEditModal(9)">编辑</a>
+                                <a href="javascript:void(0)" class="action-link" onclick="deleteItem(9)">删除</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>10</td>
+                            <td>人</td>
+                            <td>Person</td>
+                            <td>人</td>
+                            <td>
+                                <a href="javascript:void(0)" class="action-link" onclick="openEditModal(10)">编辑</a>
+                                <a href="javascript:void(0)" class="action-link" onclick="deleteItem(10)">删除</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>11</td>
+                            <td>回</td>
+                            <td>Time</td>
+                            <td>回</td>
+                            <td>
+                                <a href="javascript:void(0)" class="action-link" onclick="openEditModal(11)">编辑</a>
+                                <a href="javascript:void(0)" class="action-link" onclick="deleteItem(11)">删除</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>12</td>
+                            <td>趟</td>
+                            <td>Trip</td>
+                            <td>便</td>
+                            <td>
+                                <a href="javascript:void(0)" class="action-link" onclick="openEditModal(12)">编辑</a>
+                                <a href="javascript:void(0)" class="action-link" onclick="deleteItem(12)">删除</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>13</td>
+                            <td>张</td>
+                            <td>Sheet</td>
+                            <td>枚</td>
+                            <td>
+                                <a href="javascript:void(0)" class="action-link" onclick="openEditModal(13)">编辑</a>
+                                <a href="javascript:void(0)" class="action-link" onclick="deleteItem(13)">删除</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>14</td>
+                            <td>托</td>
+                            <td>Pallet</td>
+                            <td>パレット</td>
+                            <td>
+                                <a href="javascript:void(0)" class="action-link" onclick="openEditModal(14)">编辑</a>
+                                <a href="javascript:void(0)" class="action-link" onclick="deleteItem(14)">删除</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>15</td>
+                            <td>箱</td>
+                            <td>Box</td>
+                            <td>箱</td>
+                            <td>
+                                <a href="javascript:void(0)" class="action-link" onclick="openEditModal(15)">编辑</a>
+                                <a href="javascript:void(0)" class="action-link" onclick="deleteItem(15)">删除</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>16</td>
+                            <td>收入吨</td>
+                            <td>RT</td>
+                            <td>レベニュートン</td>
+                            <td>
+                                <a href="javascript:void(0)" class="action-link" onclick="openEditModal(16)">编辑</a>
+                                <a href="javascript:void(0)" class="action-link" onclick="deleteItem(16)">删除</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="pagination">
+                    <button onclick="changePage(1)">1</button>
+                    <button onclick="changePage(2)">2</button>
+                    <button onclick="changePage(3)">3</button>
+                    <span>...</span>
+                    <button onclick="changePage(10)">10</button>
+                </div>
+            </div>
+
+            <!-- 车型 -->
+            <div id="vehicle-type" class="tab-content">
+                <div class="search-bar">
+                    <input type="text" placeholder="搜索车型">
+                    <button class="button">搜索</button>
+                </div>
+                <button class="button" style="margin-bottom: 16px;" onclick="openEditModal()">新建车型</button>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>中文名</th>
+                            <th>英文名</th>
+                            <th>日文名</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>最小车型</td>
+                            <td>Min.</td>
+                            <td>最小車型</td>
+                            <td>
+                                <a href="javascript:void(0)" class="action-link" onclick="openEditModal(1)">编辑</a>
+                                <a href="javascript:void(0)" class="action-link" onclick="deleteItem(1)">删除</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>包车</td>
+                            <td>Charter</td>
+                            <td>貸切</td>
+                            <td>
+                                <a href="javascript:void(0)" class="action-link" onclick="openEditModal(2)">编辑</a>
+                                <a href="javascript:void(0)" class="action-link" onclick="deleteItem(2)">删除</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>拼车</td>
+                            <td>Shared</td>
+                            <td>混載</td>
+                            <td>
+                                <a href="javascript:void(0)" class="action-link" onclick="openEditModal(3)">编辑</a>
+                                <a href="javascript:void(0)" class="action-link" onclick="deleteItem(3)">删除</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>5.2米车</td>
+                            <td>5.2m Truck</td>
+                            <td>5.2mトラック</td>
+                            <td>
+                                <a href="javascript:void(0)" class="action-link" onclick="openEditModal(4)">编辑</a>
+                                <a href="javascript:void(0)" class="action-link" onclick="deleteItem(4)">删除</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td>冷藏车</td>
+                            <td>Refrigerated Truck</td>
+                            <td>冷凍車</td>
+                            <td>
+                                <a href="javascript:void(0)" class="action-link" onclick="openEditModal(5)">编辑</a>
+                                <a href="javascript:void(0)" class="action-link" onclick="deleteItem(5)">删除</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="pagination">
+                    <button onclick="changePage(1)">1</button>
+                    <button onclick="changePage(2)">2</button>
+                    <button onclick="changePage(3)">3</button>
+                    <span>...</span>
+                    <button onclick="changePage(10)">10</button>
+                </div>
+            </div>
+
+            <!-- 添加模态框 -->
+            <div id="editModal" class="modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 id="modalTitle">编辑</h3>
+                        <span class="modal-close" onclick="closeModal()">&times;</span>
+                    </div>
+                    <form id="editForm">
+                        <input type="hidden" id="editId">
+                        <div class="form-group">
+                            <label>中文名</label>
+                            <input type="text" id="editChineseName" required>
+                        </div>
+                        <div class="form-group">
+                            <label>英文名</label>
+                            <input type="text" id="editEnglishName" required>
+                        </div>
+                        <div class="form-group">
+                            <label>日文名</label>
+                            <input type="text" id="editJapaneseName" required>
+                        </div>
+                        <div class="form-group">
+                            <label>计费单位</label>
+                            <select id="editBillingUnit" required>
+                                <option value="">请选择计费单位</option>
+                                <option value="CM">厘米(CM)</option>
+                                <option value="CBM">立方米(CBM)</option>
+                                <option value="KG">公斤(KG)</option>
+                                <option value="20GP">20尺标准箱(20GP)</option>
+                                <option value="20FR">20尺冷藏箱(20FR)</option>
+                                <option value="Vehicle">车</option>
+                                <option value="Ticket">票</option>
+                                <option value="Piece">件</option>
+                                <option value="Day">天</option>
+                                <option value="Person">人</option>
+                                <option value="Time">回</option>
+                                <option value="Trip">趟</option>
+                                <option value="Sheet">张</option>
+                                <option value="Pallet">托</option>
+                                <option value="Box">箱</option>
+                                <option value="RT">收入吨(RT)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>归属费用组</label>
+                            <select id="editFeeGroup" required>
+                                <option value="">请选择费用组</option>
+                                <option value="china_ocean_export">中国侧海运出口费用</option>
+                                <option value="china_ocean_import">中国侧海运进口费用</option>
+                                <option value="japan_ocean_export">日本侧海运出口费用</option>
+                                <option value="japan_ocean_import">日本侧海运进口费用</option>
+                                <option value="ocean_related">海运相关费用</option>
+                                <option value="air_related">空运相关费用</option>
+                                <option value="land_related">陆运相关费用</option>
+                                <option value="railway_related">铁路运输相关费用</option>
+                                <option value="domestic_shipping">内航船运输相关费用</option>
+                                <option value="insurance">保险费用</option>
+                                <option value="handling">搬运相关费用</option>
+                                <option value="packing">包装相关费用</option>
+                                <option value="warehouse">仓储相关费用</option>
+                                <option value="interior">内装相关费用</option>
+                                <option value="bonded_area">保税区相关费用</option>
+                                <option value="one_day_tour">一日游相关费用</option>
+                                <option value="packaging">包材相关费用</option>
+                            </select>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="button" onclick="closeModal()" style="background: #fff; color: #666; border: 1px solid #d9d9d9;">取消</button>
+                            <button type="submit" class="button">保存</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 页面加载时恢复上次选中的tab
+        window.onload = function() {
+            const lastTab = localStorage.getItem('currentTab') || 'fee-name';
+            switchTab(lastTab);
+        }
+
+        function switchTab(tabId) {
+            // 保存当前选中的tab
+            localStorage.setItem('currentTab', tabId);
+            
+            // 隐藏所有内容
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // 取消所有tab的激活状态
+            document.querySelectorAll('.tab-item').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // 显示选中的内容
+            document.getElementById(tabId).classList.add('active');
+            
+            // 激活选中的tab
+            document.querySelector(`.tab-item[onclick="switchTab('${tabId}')"]`).classList.add('active');
+        }
+
+        // 打开编辑模态框
+        function openEditModal(id) {
+            const modal = document.getElementById('editModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const editId = document.getElementById('editId');
+            const editChineseName = document.getElementById('editChineseName');
+            const editEnglishName = document.getElementById('editEnglishName');
+            const editJapaneseName = document.getElementById('editJapaneseName');
+            const editBillingUnit = document.getElementById('editBillingUnit');
+            const editFeeGroup = document.getElementById('editFeeGroup');
+            
+            // 获取当前激活的tab
+            const activeTab = document.querySelector('.tab-item.active').textContent;
+            
+            modalTitle.textContent = id ? `编辑${activeTab}` : `新建${activeTab}`;
+            
+            if (id) {
+                // 编辑现有数据
+                const row = document.querySelector(`tr[data-id="${id}"]`);
+                if (row) {
+                    editId.value = id;
+                    editChineseName.value = row.children[1].textContent;
+                    editEnglishName.value = row.children[2].textContent;
+                    editJapaneseName.value = row.children[3].textContent;
+                    // 设置计费单位和费用组的值
+                    if (activeTab === '费用名称') {
+                        editBillingUnit.value = row.children[4].textContent;
+                        editFeeGroup.value = row.children[5].textContent;
+                    }
+                }
+            } else {
+                // 新建数据
+                editId.value = '';
+                editChineseName.value = '';
+                editEnglishName.value = '';
+                editJapaneseName.value = '';
+                editBillingUnit.value = '';
+                editFeeGroup.value = '';
+            }
+            
+            // 根据当前tab显示或隐藏额外字段
+            const extraFields = document.querySelectorAll('#editBillingUnit, #editFeeGroup');
+            extraFields.forEach(field => {
+                field.closest('.form-group').style.display = 
+                    activeTab === '费用名称' ? 'block' : 'none';
+            });
+            
+            modal.style.display = 'block';
+        }
+        
+        // 关闭模态框
+        function closeModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+        
+        // 处理表单提交
+        document.getElementById('editForm').onsubmit = function(e) {
+            e.preventDefault();
+            
+            const activeTab = document.querySelector('.tab-item.active').textContent;
+            const data = {
+                id: document.getElementById('editId').value,
+                chineseName: document.getElementById('editChineseName').value,
+                englishName: document.getElementById('editEnglishName').value,
+                japaneseName: document.getElementById('editJapaneseName').value
+            };
+            
+            // 如果是费用名称，添加额外字段
+            if (activeTab === '费用名称') {
+                data.billingUnit = document.getElementById('editBillingUnit').value;
+                data.feeGroup = document.getElementById('editFeeGroup').value;
+            }
+            
+            // 这里应该发送到后端API
+            console.log('保存数据:', data);
+            
+            // 模拟成功保存
+            alert('保存成功！');
+            closeModal();
+        };
+        
+        // 分页功能
+        function changePage(page) {
+            // 移除所有页码的激活状态
+            document.querySelectorAll('.pagination button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // 激活当前页码
+            event.target.classList.add('active');
+            
+            // 这里应该请求对应页码的数据
+            console.log('切换到页码:', page);
+        }
+        
+        // 删除功能
+        function deleteItem(id) {
+            if (confirm('确定要删除这条记录吗？')) {
+                // 这里应该发送删除请求到后端API
+                console.log('删除ID:', id);
+                alert('删除成功！');
+            }
+        }
+    </script>
+</body>
+</html> 
