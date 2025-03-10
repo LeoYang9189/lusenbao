@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>运价详情 - 运价报价管理系统</title>
+    <style>
+        /* 复用基础样式 */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+        .navbar {
+            background: #001529;
+            padding: 0 20px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            color: white;
+        }
+        .navbar h1 {
+            margin: 0;
+            font-size: 18px;
+        }
+        .container {
+            display: flex;
+            min-height: calc(100vh - 50px);
+        }
+        .sidebar {
+            width: 200px;
+            background: #001529;
+            padding: 20px 0;
+        }
+        .menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .menu li {
+            padding: 10px 20px;
+        }
+        .menu a {
+            color: #fff;
+            text-decoration: none;
+            display: block;
+        }
+        .menu a:hover {
+            color: #1890ff;
+        }
+        .content {
+            flex: 1;
+            padding: 20px;
+            background: #f0f2f5;
+        }
+
+        /* 表单样式 */
+        .form-container {
+            background: #fff;
+            padding: 24px;
+            border-radius: 4px;
+            margin: 0 auto;
+        }
+
+        .form-title {
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .button-group {
+            margin-top: 24px;
+            text-align: center;
+        }
+
+        .button {
+            background: #1890ff;
+            color: white;
+            border: none;
+            padding: 8px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 0 8px;
+        }
+
+        .button.secondary {
+            background: #fff;
+            color: #666;
+            border: 1px solid #d9d9d9;
+        }
+
+        /* 模块样式 */
+        .module {
+            margin-bottom: 24px;
+            border: 1px solid #f0f0f0;
+            border-radius: 4px;
+        }
+
+        .module-title {
+            padding: 12px 16px;
+            background: #fafafa;
+            border-bottom: 1px solid #f0f0f0;
+            font-weight: 500;
+        }
+
+        .module-content {
+            padding: 16px;
+        }
+
+        /* 表单网格布局 */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+
+        .form-group {
+            display: flex;
+            align-items: center;
+        }
+
+        .form-group label {
+            width: 100px;
+            margin-right: 8px;
+        }
+
+        .form-group input,
+        .form-group select {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            background-color: #f5f5f5; /* 只读输入框背景色 */
+        }
+
+        /* 费用表格样式 */
+        .fee-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 16px;
+        }
+
+        .fee-table th,
+        .fee-table td {
+            padding: 12px;
+            border: 1px solid #f0f0f0;
+            min-width: 100px;
+        }
+
+        .fee-table th {
+            background: #fafafa;
+            font-weight: 500;
+        }
+
+        .fee-group-header {
+            background: #f0f8ff;
+            font-weight: 500;
+        }
+
+        .add-fee-button {
+            margin: 16px 0;
+        }
+
+        /* 调整费用名称多选框的宽度 */
+        .fee-table select[multiple] {
+            min-width: 150px;
+            height: 80px;
+        }
+
+        /* 调整数字输入框的宽度 */
+        .fee-table input[type="number"] {
+            min-width: 80px;
+            background-color: #f5f5f5; /* 只读输入框背景色 */
+        }
+
+        /* 调整费用组选择框的宽度 */
+        .fee-table select:not([multiple]) {
+            min-width: 150px;
+            background-color: #f5f5f5; /* 只读下拉框背景色 */
+        }
+
+        /* 添加有效期区间的样式 */
+        .form-group input[type="date"] {
+            width: 150px;
+        }
+
+        /* 添加历史按钮样式 */
+        .history-button {
+            background: #1890ff;
+            color: white;
+            border: none;
+            padding: 2px 8px;
+            border-radius: 2px;
+            cursor: pointer;
+            margin-left: 8px;
+            font-size: 12px;
+        }
+        
+        /* 弹窗样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+        
+        .modal-content {
+            position: relative;
+            background: #fff;
+            width: 800px;
+            margin: 80px auto;
+            padding: 20px;
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .modal-title {
+            font-size: 16px;
+            font-weight: 500;
+            margin: 0;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #999;
+        }
+        
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .history-table th,
+        .history-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .history-table th {
+            background: #fafafa;
+        }
+        
+        .clickable {
+            color: #1890ff;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h1>运价报价管理系统 - 运价详情</h1>
+    </div>
+    <div class="container">
+        <div class="sidebar">
+            <ul class="menu">
+                <li><a href="basic-data.html">基础资料管理</a></li>
+                <li><a href="freight-maintenance.html">运价维护</a></li>
+                <li><a href="freight-query.html">运价查询</a></li>
+                <li><a href="quotation.html">报价管理</a></li>
+            </ul>
+        </div>
+        <div class="content">
+            <div style="background: #ffe58f; padding: 10px; margin-bottom: 15px; border-radius: 4px; font-weight: bold; color: #873800;">
+                ！！！只是概要的页面显示方案构想，最终实现效果需要细节确认之后再以实际为准
+            </div>
+            <div class="form-container">
+                <div class="form-title">
+                    <h2>运价详情</h2>
+                </div>
+                <form id="viewFreightForm">
+                    <!-- 基本信息模块 -->
+                    <div class="module">
+                        <div class="module-title">基本信息</div>
+                        <div class="module-content">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label>运价编号</label>
+                                    <input type="text" id="freightNo" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label>起点</label>
+                                    <input type="text" id="startPoint" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label>终点</label>
+                                    <input type="text" id="endPoint" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label>规格</label>
+                                    <input type="text" id="specification" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label>代理名称</label>
+                                    <input type="text" id="agentName" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label>有效期</label>
+                                    <div style="display: flex; align-items: center;">
+                                        <input type="date" id="validFrom" readonly>
+                                        <span style="margin: 0 8px;">至</span>
+                                        <input type="date" id="validTo" readonly>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>创建人</label>
+                                    <input type="text" id="creator" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label>创建时间</label>
+                                    <input type="text" id="createTime" readonly>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 费用信息模块 -->
+                    <div class="module">
+                        <div class="module-title">费用信息</div>
+                        <div class="module-content">
+                            <div id="feeTableContainer">
+                                <!-- 费用表格将由JavaScript动态生成 -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="button" class="button secondary" onclick="window.location.href='freight-query.html'">返回</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 历史报价弹窗 -->
+    <div id="quoteHistoryModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">历史报价记录</h3>
+                <button class="modal-close" onclick="closeModal('quoteHistoryModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <table class="history-table">
+                    <thead>
+                        <tr>
+                            <th>报价单号</th>
+                            <th>金额</th>
+                            <th>报价时间</th>
+                            <th>代理名称</th>
+                        </tr>
+                    </thead>
+                    <tbody id="quoteHistoryTableBody">
+                        <!-- 将由 JavaScript 动态填充 -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- 历史交易弹窗 -->
+    <div id="tradeHistoryModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">历史交易记录</h3>
+                <button class="modal-close" onclick="closeModal('tradeHistoryModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <table class="history-table">
+                    <thead>
+                        <tr>
+                            <th>订单编号</th>
+                            <th>金额</th>
+                            <th>订舱时间</th>
+                            <th>代理名称</th>
+                            <th>成交委托单位</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tradeHistoryTableBody">
+                        <!-- 将由 JavaScript 动态填充 -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 定义费用组数据
+        const feeGroups = {
+            "china_ocean_export": {
+                label: "中国侧海运出口费用",
+                fees: [
+                    { name: "海运费", unit: "20GP" },
+                    { name: "订舱费", unit: "票" },
+                    { name: "文件费", unit: "票" }
+                ]
+            },
+            "china_ocean_import": {
+                label: "中国侧海运进口费用",
+                fees: [
+                    { name: "换单费", unit: "票" },
+                    { name: "提货费", unit: "20GP" }
+                ]
+            },
+            "japan_ocean_export": {
+                label: "日本侧海运出口费用",
+                fees: [
+                    { name: "D/O费", unit: "票" },
+                    { name: "THC费", unit: "20GP" }
+                ]
+            }
+        };
+
+        // 费用行数据
+        let feeRows = [];
+
+        // 解析URL参数获取运价ID
+        function getFreightIdFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('id') || '1'; // 如果没有 id 参数，返回默认值 '1'
+        }
+
+        // 获取运价详情数据
+        function getFreightDetailById(id) {
+            // 这里应该是从后端API获取数据
+            // 现在使用模拟数据
+            const mockData = [
+                {
+                    id: 1,
+                    freightNo: 'FR202403001',
+                    startPoint: '上海',
+                    endPoint: '东京',
+                    specification: '标准',
+                    agentName: '上海航运代理有限公司',
+                    validFrom: '2024-03-01',
+                    validTo: '2024-12-31',
+                    creator: '张三',
+                    createTime: '2024-03-01 10:00:00',
+                    fees: [
+                        {
+                            id: 101,
+                            feeGroup: 'china_ocean_export',
+                            feeNames: ['海运费'],
+                            unit: '20GP',
+                            currency: 'USD',
+                            price: '1200',
+                            minPrice: '1000',
+                            taxRate: '13',
+                            suggestedPrice: '1300',
+                            suggestedTaxRate: '13'
+                        },
+                        {
+                            id: 102,
+                            feeGroup: 'china_ocean_export',
+                            feeNames: ['订舱费'],
+                            unit: '票',
+                            currency: 'CNY',
+                            price: '200',
+                            minPrice: '200',
+                            taxRate: '6',
+                            suggestedPrice: '250',
+                            suggestedTaxRate: '6'
+                        },
+                        {
+                            id: 103,
+                            feeGroup: 'japan_ocean_export',
+                            feeNames: ['THC费'],
+                            unit: '20GP',
+                            currency: 'JPY',
+                            price: '25000',
+                            minPrice: '25000',
+                            taxRate: '10',
+                            suggestedPrice: '27000',
+                            suggestedTaxRate: '10'
+                        }
+                    ]
+                },
+                // 更多模拟数据...
+            ];
+
+            return mockData.find(item => item.id == id);
+        }
+
+        // 渲染费用表格（修改版）
+        function renderFeeTable() {
+            const container = document.getElementById('feeTableContainer');
+            if (feeRows.length === 0) {
+                container.innerHTML = '<p>暂无费用信息</p>';
+                return;
+            }
+
+            // 按费用组分组
+            const groupedRows = {};
+            feeRows.forEach(row => {
+                const groupId = row.feeGroup;
+                if (!groupedRows[groupId]) {
+                    groupedRows[groupId] = [];
+                }
+                groupedRows[groupId].push(row);
+            });
+
+            let html = `
+                <table class="fee-table">
+                    <thead>
+                        <tr>
+                            <th>费用名称</th>
+                            <th>计费单位</th>
+                            <th>币种</th>
+                            <th>含税价</th>
+                            <th>Min.</th>
+                            <th>税率</th>
+                            <th>建议报价</th>
+                            <th>报价税率</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            Object.entries(groupedRows).forEach(([groupId, rows]) => {
+                if (groupId) {
+                    html += `
+                        <tr class="fee-group-header">
+                            <td colspan="8">${feeGroups[groupId]?.label || ''}</td>
+                        </tr>
+                    `;
+                }
+
+                rows.forEach(row => {
+                    html += `
+                        <tr data-id="${row.id}">
+                            <td>${row.feeNames[0] || ''}</td>
+                            <td>${row.unit}</td>
+                            <td>${row.currency}</td>
+                            <td>
+                                ${row.price}
+                                <button class="history-button" onclick="showQuoteHistory(${row.id}, '${row.feeNames[0]}', event)">历史报价</button>
+                                <button class="history-button" onclick="showTradeHistory(${row.id}, '${row.feeNames[0]}', event)">历史交易</button>
+                            </td>
+                            <td>${row.minPrice}</td>
+                            <td>${row.taxRate ? row.taxRate + '%' : ''}</td>
+                            <td>${row.suggestedPrice}</td>
+                            <td>${row.suggestedTaxRate ? row.suggestedTaxRate + '%' : ''}</td>
+                        </tr>
+                    `;
+                });
+            });
+
+            html += `
+                    </tbody>
+                </table>
+            `;
+            container.innerHTML = html;
+        }
+
+        // 历史报价数据（虚拟）
+        const quoteHistoryData = {
+            101: [
+                { quoteNo: 'Q202401001', amount: 'USD 1250', quoteTime: '2024-01-15 14:30:22', agentName: '上海航运代理有限公司' },
+                { quoteNo: 'Q202401045', amount: 'USD 1220', quoteTime: '2024-01-25 09:45:18', agentName: '上海航运代理有限公司' },
+                { quoteNo: 'Q202402112', amount: 'USD 1280', quoteTime: '2024-02-10 15:22:36', agentName: '上海航运代理有限公司' }
+            ],
+            102: [
+                { quoteNo: 'Q202401023', amount: 'CNY 220', quoteTime: '2024-01-18 10:15:30', agentName: '上海航运代理有限公司' },
+                { quoteNo: 'Q202402051', amount: 'CNY 210', quoteTime: '2024-02-05 13:40:12', agentName: '上海航运代理有限公司' }
+            ],
+            103: [
+                { quoteNo: 'Q202401078', amount: 'JPY 26000', quoteTime: '2024-01-22 16:50:45', agentName: '名古屋物流株式会社' },
+                { quoteNo: 'Q202402089', amount: 'JPY 25500', quoteTime: '2024-02-08 11:20:33', agentName: '东京海运株式会社' },
+                { quoteNo: 'Q202402120', amount: 'JPY 25800', quoteTime: '2024-02-12 14:15:27', agentName: '名古屋物流株式会社' }
+            ]
+        };
+
+        // 历史交易数据（虚拟）
+        const tradeHistoryData = {
+            101: [
+                { orderNo: 'O202401025', amount: 'USD 1250', bookingTime: '2024-01-16 09:30:42', agentName: '上海航运代理有限公司', client: '中国外贸集团' },
+                { orderNo: 'O202402036', amount: 'USD 1280', bookingTime: '2024-02-12 13:45:21', agentName: '上海航运代理有限公司', client: '上海进出口贸易有限公司' }
+            ],
+            102: [
+                { orderNo: 'O202401047', amount: 'CNY 220', bookingTime: '2024-01-19 15:22:38', agentName: '上海航运代理有限公司', client: '中国外贸集团' }
+            ],
+            103: [
+                { orderNo: 'O202401062', amount: 'JPY 26000', bookingTime: '2024-01-23 10:40:15', agentName: '名古屋物流株式会社', client: '松下电器贸易（上海）有限公司' },
+                { orderNo: 'O202402087', amount: 'JPY 25800', bookingTime: '2024-02-13 14:35:28', agentName: '名古屋物流株式会社', client: '丰田汽车（中国）投资有限公司' }
+            ]
+        };
+
+        // 重写弹窗相关函数，确保正确传递和处理事件
+        function showQuoteHistory(feeId, feeName, event) {
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            
+            const modal = document.getElementById('quoteHistoryModal');
+            const tableBody = document.getElementById('quoteHistoryTableBody');
+            
+            // 更新标题
+            document.querySelector('#quoteHistoryModal .modal-title').textContent = `历史报价记录 - ${feeName}`;
+            
+            // 获取数据
+            const historyData = quoteHistoryData[feeId] || [];
+            
+            // 生成表格内容
+            tableBody.innerHTML = '';
+            if (historyData.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="4" style="text-align: center;">暂无历史报价记录</td></tr>';
+            } else {
+                historyData.forEach(item => {
+                    tableBody.innerHTML += `
+                        <tr>
+                            <td><span class="clickable">${item.quoteNo}</span></td>
+                            <td>${item.amount}</td>
+                            <td>${item.quoteTime}</td>
+                            <td>${item.agentName}</td>
+                        </tr>
+                    `;
+                });
+            }
+            
+            // 显示弹窗
+            modal.style.display = 'block';
+        }
+
+        function showTradeHistory(feeId, feeName, event) {
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            
+            const modal = document.getElementById('tradeHistoryModal');
+            const tableBody = document.getElementById('tradeHistoryTableBody');
+            
+            // 更新标题
+            document.querySelector('#tradeHistoryModal .modal-title').textContent = `历史交易记录 - ${feeName}`;
+            
+            // 获取数据
+            const historyData = tradeHistoryData[feeId] || [];
+            
+            // 生成表格内容
+            tableBody.innerHTML = '';
+            if (historyData.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="5" style="text-align: center;">暂无历史交易记录</td></tr>';
+            } else {
+                historyData.forEach(item => {
+                    tableBody.innerHTML += `
+                        <tr>
+                            <td><span class="clickable">${item.orderNo}</span></td>
+                            <td>${item.amount}</td>
+                            <td>${item.bookingTime}</td>
+                            <td>${item.agentName}</td>
+                            <td>${item.client}</td>
+                        </tr>
+                    `;
+                });
+            }
+            
+            // 显示弹窗
+            modal.style.display = 'block';
+        }
+
+        function closeModal(modalId, event) {
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // 初始化时为关闭按钮添加事件监听器
+        document.addEventListener('DOMContentLoaded', function() {
+            // 为所有关闭按钮添加事件处理
+            const closeButtons = document.querySelectorAll('.modal-close');
+            closeButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const modalId = this.closest('.modal').id;
+                    document.getElementById(modalId).style.display = 'none';
+                });
+            });
+
+            // 点击弹窗背景时关闭弹窗
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        this.style.display = 'none';
+                    }
+                });
+            });
+            
+            // 防止点击弹窗内容时关闭弹窗
+            const modalContents = document.querySelectorAll('.modal-content');
+            modalContents.forEach(content => {
+                content.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                });
+            });
+        });
+
+        window.onload = function() {
+            let freightId = getFreightIdFromUrl();
+            
+            // 如果没有 ID，使用默认值 1（直接访问页面时）
+            if (!freightId) {
+                freightId = '1';
+            }
+
+            const freightDetail = getFreightDetailById(freightId);
+            if (!freightDetail) {
+                alert('未找到运价信息');
+                window.location.href = 'freight-query.html';
+                return;
+            }
+
+            // 填充基本信息
+            document.getElementById('freightNo').value = freightDetail.freightNo;
+            document.getElementById('startPoint').value = freightDetail.startPoint;
+            document.getElementById('endPoint').value = freightDetail.endPoint;
+            document.getElementById('specification').value = freightDetail.specification;
+            document.getElementById('agentName').value = freightDetail.agentName;
+            document.getElementById('validFrom').value = freightDetail.validFrom;
+            document.getElementById('validTo').value = freightDetail.validTo;
+            document.getElementById('creator').value = freightDetail.creator;
+            document.getElementById('createTime').value = freightDetail.createTime;
+
+            // 填充费用信息
+            feeRows = freightDetail.fees;
+            renderFeeTable();
+        };
+    </script>
+</body>
+</html> 
