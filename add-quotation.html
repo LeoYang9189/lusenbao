@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>新建报价单 - 运价报价管理系统</title>
+    <style>
+        /* 复用基础样式 */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+        .navbar {
+            background: #001529;
+            padding: 0 20px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            color: white;
+        }
+        .navbar h1 {
+            margin: 0;
+            font-size: 18px;
+        }
+        .container {
+            display: flex;
+            min-height: calc(100vh - 50px);
+        }
+        .sidebar {
+            width: 200px;
+            background: #001529;
+            padding: 20px 0;
+        }
+        .menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .menu li {
+            padding: 10px 20px;
+        }
+        .menu a {
+            color: #fff;
+            text-decoration: none;
+            display: block;
+        }
+        .menu a:hover {
+            color: #1890ff;
+        }
+        .content {
+            flex: 1;
+            padding: 20px;
+            background: #f0f2f5;
+            overflow: auto;
+        }
+
+        /* 表单容器样式 */
+        .form-container {
+            background: #fff;
+            border-radius: 4px;
+            padding: 24px;
+        }
+
+        .form-title {
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .form-title h2 {
+            margin: 0;
+        }
+
+        /* 模块样式 */
+        .module {
+            margin-bottom: 24px;
+            border: 1px solid #f0f0f0;
+            border-radius: 2px;
+        }
+
+        .module-title {
+            background: #fafafa;
+            padding: 12px 16px;
+            font-weight: 500;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .module-content {
+            padding: 16px;
+        }
+
+        /* 表单网格 */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        .form-group {
+            display: flex;
+            align-items: center;
+        }
+
+        .form-group label {
+            width: 100px;
+            margin-right: 8px;
+        }
+
+        .form-group input,
+        .form-group select {
+            flex: 1;
+            padding: 6px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+        }
+
+        /* 按钮样式 */
+        .button-group {
+            margin-top: 24px;
+            text-align: center;
+        }
+
+        .button {
+            background: #1890ff;
+            color: white;
+            border: none;
+            padding: 8px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 0 8px;
+        }
+
+        .button.secondary {
+            background: #fff;
+            color: #666;
+            border: 1px solid #d9d9d9;
+        }
+
+        /* 费用表格样式 */
+        .fee-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 16px;
+        }
+
+        .fee-table th,
+        .fee-table td {
+            padding: 12px;
+            border: 1px solid #f0f0f0;
+        }
+
+        .fee-table th {
+            background: #fafafa;
+            font-weight: 500;
+        }
+
+        /* 选择运价按钮样式 */
+        .select-freight-button {
+            margin-bottom: 16px;
+        }
+
+        /* 链接样式 */
+        .action-link {
+            color: #1890ff;
+            margin-right: 10px;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /* 只读输入框样式 */
+        input[readonly] {
+            background-color: #f5f5f5;
+            color: #666;
+            cursor: not-allowed;
+        }
+
+        /* 表格输入框样式 */
+        .fee-table input[type="number"] {
+            width: 100px;
+            padding: 4px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+        }
+
+        /* 警告提示样式 */
+        .warning-notice {
+            background: #ffe58f;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            font-weight: bold;
+            color: #873800;
+        }
+
+        /* 复选框组样式 */
+        .checkbox-group {
+            display: flex;
+            gap: 16px;
+        }
+        
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        /* 计费重量输入框组合样式 */
+        .weight-input {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .weight-input input {
+            flex: 1;
+        }
+        
+        .weight-input select {
+            width: 80px;
+        }
+        
+        /* 费用区域样式 */
+        .cost-section,
+        .quote-section {
+            margin-top: 20px;
+        }
+        
+        .cost-section h3,
+        .quote-section h3 {
+            margin-bottom: 16px;
+            color: #666;
+        }
+
+        /* 费用表格小计和总计样式 */
+        .fee-table tr.subtotal {
+            background-color: #fafafa;
+            font-weight: 500;
+        }
+
+        .fee-table tr.subtotal td {
+            border-top: 2px solid #f0f0f0;
+        }
+
+        .fee-table tr.total {
+            background-color: #e6f7ff;
+            font-weight: bold;
+        }
+
+        .fee-table tr.total td {
+            border-top: 2px solid #1890ff;
+        }
+
+        /* 数字金额右对齐 */
+        .fee-table td:nth-child(5),
+        .fee-table td:nth-child(6),
+        .fee-table td:nth-child(7) {
+            text-align: right;
+        }
+
+        /* 模态框样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            overflow: auto;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            margin: 2% auto;
+            padding: 20px;
+            border-radius: 4px;
+            width: 60%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            position: sticky;
+            top: 0;
+            background: #fff;
+            z-index: 1;
+            padding: 10px 0;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .modal-footer {
+            margin-top: 20px;
+            text-align: right;
+            position: sticky;
+            bottom: 0;
+            background: #fff;
+            z-index: 1;
+            padding: 10px 0;
+        }
+
+        .modal-body {
+            margin: 10px 0;
+        }
+
+        .modal-body img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h1>运价报价管理系统 - 新建报价单</h1>
+    </div>
+    <div class="container">
+        <div class="sidebar">
+            <ul class="menu">
+                <li><a href="basic-data.html">基础资料管理</a></li>
+                <li><a href="freight-maintenance.html">运价维护</a></li>
+                <li><a href="freight-query.html">运价查询</a></li>
+                <li><a href="quotation.html">报价管理</a></li>
+            </ul>
+        </div>
+        <div class="content">
+            <div style="background: #ffe58f; padding: 10px; margin-bottom: 15px; border-radius: 4px; font-weight: bold; color: #873800;">
+                ！！！只是概要的页面显示方案构想，最终实现效果需要细节确认之后再以实际为准
+            </div>
+
+            <div class="form-container">
+                <form id="addQuotationForm">
+                    <!-- 基本信息模块 -->
+                    <div class="module">
+                        <div class="module-title">基本信息</div>
+                        <div class="module-content">
+                            <div class="form-title">
+                                <h2>新建报价单</h2>
+                                <div id="viewModeButtons" style="display: none;">
+                                    <button type="button" class="button" onclick="generateOrder()">生成订单</button>
+                                </div>
+                            </div>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label>报价单号</label>
+                                    <input type="text" id="quotationNo" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label>客户名称</label>
+                                    <input type="text" id="customerName" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>代理名称</label>
+                                    <input type="text" id="agentName" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>有效期从</label>
+                                    <input type="date" id="validFrom" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>有效期至</label>
+                                    <input type="date" id="validTo" required>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 运输信息模块 -->
+                    <div class="module">
+                        <div class="module-title">运输信息</div>
+                        <div class="module-content">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label>贸易方式</label>
+                                    <select id="tradeMode">
+                                        <option value="FOB">FOB</option>
+                                        <option value="CIF">CIF</option>
+                                        <option value="EXW">EXW</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>保险条件</label>
+                                    <select id="insuranceTerms">
+                                        <option value="ICC-A">ICC-A</option>
+                                        <option value="ICC-B">ICC-B</option>
+                                        <option value="ICC-C">ICC-C</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>收货地</label>
+                                    <input type="text" id="pickupLocation">
+                                </div>
+                                <div class="form-group">
+                                    <label>交货地</label>
+                                    <input type="text" id="deliveryLocation">
+                                </div>
+                                <div class="form-group">
+                                    <label>业务类型</label>
+                                    <select id="businessType">
+                                        <option value="海运">海运</option>
+                                        <option value="空运">空运</option>
+                                        <option value="陆运">陆运</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 货物信息模块 -->
+                    <div class="module">
+                        <div class="module-title">货物信息</div>
+                        <div class="module-content">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label>品名</label>
+                                    <input type="text" id="cargoName">
+                                </div>
+                                <div class="form-group">
+                                    <label>HSCODE</label>
+                                    <input type="text" id="hsCode">
+                                </div>
+                                <div class="form-group">
+                                    <label>描述</label>
+                                    <select id="description">
+                                        <option value="零部件">零部件</option>
+                                        <option value="适用于制造硅片的无尘搬运机">适用于制造硅片的无尘搬运机</option>
+                                        <option value="无品牌">无品牌</option>
+                                        <option value="型号SBX">型号SBX</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>包装</label>
+                                    <div class="checkbox-group">
+                                        <label><input type="checkbox" name="packaging" value="裸品">裸品</label>
+                                        <label><input type="checkbox" name="packaging" value="纸箱">纸箱</label>
+                                        <label><input type="checkbox" name="packaging" value="托盘">托盘</label>
+                                        <label><input type="checkbox" name="packaging" value="木箱">木箱</label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>件数</label>
+                                    <input type="number" id="quantity">
+                                </div>
+                                <div class="form-group">
+                                    <label>毛重(KG)</label>
+                                    <input type="number" id="grossWeight">
+                                </div>
+                                <div class="form-group">
+                                    <label>体积(CBM)</label>
+                                    <input type="number" id="volume">
+                                </div>
+                                <div class="form-group">
+                                    <label>计费重量</label>
+                                    <div class="weight-input">
+                                        <input type="number" id="chargeableWeight">
+                                        <select id="weightUnit">
+                                            <option value="KG">KG</option>
+                                            <option value="RT">RT</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>出货频次</label>
+                                    <input type="text" id="frequency">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 运价信息模块 -->
+                    <div class="module">
+                        <div class="module-title">运价信息</div>
+                        <div class="module-content">
+                            <button type="button" class="button" onclick="selectFreight()">选择运价</button>
+                            <div id="selectedFreightInfo" style="display: none;">
+                                <table class="fee-table">
+                                    <thead>
+                                        <tr>
+                                            <th>运价编号</th>
+                                            <th>起运地</th>
+                                            <th>目的地</th>
+                                            <th>箱型</th>
+                                            <th>代理名称</th>
+                                            <th>有效期</th>
+                                            <th>操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="selectedFreightBody">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 费用信息模块 -->
+                    <div class="module">
+                        <div class="module-title">费用信息</div>
+                        <div class="module-content">
+                            <!-- 成本区 -->
+                            <div class="cost-section">
+                                <h3>成本信息</h3>
+                                <div id="costTableContainer"></div>
+                            </div>
+                            
+                            <!-- 报价区 -->
+                            <div class="quote-section">
+                                <h3>报价信息</h3>
+                                <button type="button" class="button" onclick="addQuoteFee()">添加费用</button>
+                                <div id="quoteTableContainer"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 按钮组 -->
+                    <div class="button-group">
+                        <button type="button" class="button secondary" onclick="window.location.href='quotation.html'">返回</button>
+                        <button type="button" class="button" onclick="openPreviewModal()">预览</button>
+                        <button type="submit" class="button">保存</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 预览弹窗 -->
+    <div id="previewModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>报价单预览</h3>
+                <button class="modal-close" onclick="closePreviewModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <img src="quota.png" alt="报价单预览" style="width: 100%;">
+            </div>
+            <div class="modal-footer">
+                <button class="button secondary" onclick="closePreviewModal()">关闭</button>
+                <button class="button" onclick="exportPreview()">导出</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 生成订单弹窗 -->
+    <div id="generateOrderModal" class="modal">
+        <div class="modal-content" style="width: 400px;">
+            <div class="modal-header">
+                <h3>确认生成订单</h3>
+                <button class="modal-close" onclick="closeGenerateOrderModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>将为您生成销售预审订舱申请，编号为 <span id="orderNo">SA202403001</span>，确认？</p>
+            </div>
+            <div class="modal-footer">
+                <button class="button secondary" onclick="closeGenerateOrderModal()">取消</button>
+                <button class="button" onclick="confirmGenerateOrder()">确认</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 生成报价单号
+        function generateQuotationNo() {
+            const date = new Date();
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const sequence = String(Math.floor(Math.random() * 1000)).padStart(3, '0');
+            return `QT${year}${month}${sequence}`;
+        }
+
+        // 选择运价，添加freightId参数
+        function selectFreight(freightId) {
+            // 如果没有传入freightId，则打开选择弹窗
+            if (!freightId) {
+                // 这里应该打开运价选择弹窗
+                alert('运价选择功能待实现');
+                return;
+            }
+
+            // 模拟运价数据
+            const freightData = {
+                freightNo: `FR${freightId}`,
+                startPoint: '上海',
+                endPoint: '东京',
+                agentName: '上海航运代理有限公司',
+                validPeriod: '2024-03-01 至 2024-12-31',
+                // 费用数据
+                costs: {
+                    // 中国侧海运出口费用
+                    localCharges: [
+                        {
+                            name: '港口操作费',
+                            unit: '20GP',
+                            currency: 'CNY',
+                            amount: 800,
+                            tax: 6
+                        },
+                        {
+                            name: '报关费',
+                            unit: '票',
+                            currency: 'CNY',
+                            amount: 350,
+                            tax: 6
+                        },
+                        {
+                            name: '电放费',
+                            unit: '票',
+                            currency: 'CNY',
+                            amount: 200,
+                            tax: 6
+                        }
+                    ],
+                    // 国际海运费用
+                    oceanFreight: [
+                        {
+                            name: '海运基本运费',
+                            unit: '20GP',
+                            currency: 'USD',
+                            amount: 2500,
+                            tax: 0
+                        },
+                        {
+                            name: '燃油附加费',
+                            unit: '20GP',
+                            currency: 'USD',
+                            amount: 300,
+                            tax: 0
+                        }
+                    ]
+                }
+            };
+
+            // 显示选择的运价信息
+            document.getElementById('selectedFreightInfo').style.display = 'block';
+            const selectedFreightBody = document.getElementById('selectedFreightBody');
+            selectedFreightBody.innerHTML = `
+                <tr>
+                    <td>${freightData.freightNo}</td>
+                    <td>${freightData.startPoint}</td>
+                    <td>${freightData.endPoint}</td>
+                    <td>20GP</td>
+                    <td>${freightData.agentName}</td>
+                    <td>${freightData.validPeriod}</td>
+                    <td>
+                        <a href="javascript:void(0)" onclick="removeFreight(this)" class="action-link">删除</a>
+                    </td>
+                </tr>
+            `;
+
+            // 自动填充基本信息
+            document.getElementById('customerName').value = '上海国际贸易有限公司';
+            document.getElementById('agentName').value = freightData.agentName;
+            document.getElementById('tradeMode').value = 'FOB';
+            document.getElementById('insuranceTerms').value = 'ICC-A';
+            document.getElementById('pickupLocation').value = freightData.startPoint;
+            document.getElementById('deliveryLocation').value = freightData.endPoint;
+            document.getElementById('businessType').value = '海运';
+            
+            // 自动填充货物信息
+            document.getElementById('cargoName').value = '电子产品';
+            document.getElementById('hsCode').value = '8517.12.00';
+            document.getElementById('description').value = '零部件';
+            document.getElementById('quantity').value = '100';
+            document.getElementById('grossWeight').value = '2000';
+            document.getElementById('volume').value = '40';
+            document.getElementById('chargeableWeight').value = '2000';
+            document.getElementById('frequency').value = '每周';
+
+            // 显示对应的费用信息
+            renderCostTable();
+            renderQuoteTable();
+        }
+
+        // 删除选择的运价
+        function removeFreight(element) {
+            const row = element.closest('tr');
+            row.remove();
+            if (document.getElementById('selectedFreightBody').children.length === 0) {
+                document.getElementById('selectedFreightInfo').style.display = 'none';
+            }
+        }
+
+        // 渲染成本表格
+        function renderCostTable() {
+            const costTableContainer = document.getElementById('costTableContainer');
+            if (!costTableContainer) return;
+            
+            costTableContainer.innerHTML = `
+                <table class="fee-table">
+                    <thead>
+                        <tr>
+                            <th>费用组</th>
+                            <th>费用名称</th>
+                            <th>计费单位</th>
+                            <th>币种</th>
+                            <th>含税价</th>
+                            <th>税率(%)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- 中国侧海运出口费用组 -->
+                        <tr>
+                            <td rowspan="3">中国侧海运出口费用</td>
+                            <td>港口操作费</td>
+                            <td>20GP</td>
+                            <td>CNY</td>
+                            <td>800</td>
+                            <td>6</td>
+                        </tr>
+                        <tr>
+                            <td>报关费</td>
+                            <td>票</td>
+                            <td>CNY</td>
+                            <td>350</td>
+                            <td>6</td>
+                        </tr>
+                        <tr>
+                            <td>电放费</td>
+                            <td>票</td>
+                            <td>CNY</td>
+                            <td>200</td>
+                            <td>6</td>
+                        </tr>
+                        <tr class="subtotal">
+                            <td colspan="3">中国侧海运出口费用小计</td>
+                            <td>CNY</td>
+                            <td>1,350</td>
+                            <td></td>
+                        </tr>
+
+                        <!-- 国际海运费用组 -->
+                        <tr>
+                            <td rowspan="2">国际海运费用</td>
+                            <td>海运基本运费</td>
+                            <td>20GP</td>
+                            <td>USD</td>
+                            <td>2,500</td>
+                            <td>0</td>
+                        </tr>
+                        <tr>
+                            <td>燃油附加费</td>
+                            <td>20GP</td>
+                            <td>USD</td>
+                            <td>300</td>
+                            <td>0</td>
+                        </tr>
+                        <tr class="subtotal">
+                            <td colspan="3">国际海运费用小计</td>
+                            <td>USD</td>
+                            <td>2,800</td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+            `;
+        }
+
+        // 渲染报价表格
+        function renderQuoteTable() {
+            const container = document.getElementById('quoteTableContainer');
+            container.innerHTML = `
+                <table class="fee-table">
+                    <thead>
+                        <tr>
+                            <th>费用组</th>
+                            <th>费用名称</th>
+                            <th>计费单位</th>
+                            <th>币种</th>
+                            <th>报价</th>
+                            <th>税率(%)</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- 中国侧海运出口费用组 -->
+                        <tr>
+                            <td rowspan="2">中国侧海运出口费用</td>
+                            <td>港口操作费</td>
+                            <td>20GP</td>
+                            <td>
+                                <select>
+                                    <option value="CNY">CNY</option>
+                                    <option value="USD">USD</option>
+                                </select>
+                            </td>
+                            <td><input type="number" value="1000"></td>
+                            <td><input type="number" value="6"></td>
+                            <td>
+                                <a href="javascript:void(0)" onclick="deleteFee(this)" class="action-link">删除</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>报关费</td>
+                            <td>票</td>
+                            <td>
+                                <select>
+                                    <option value="CNY">CNY</option>
+                                    <option value="USD">USD</option>
+                                </select>
+                            </td>
+                            <td><input type="number" value="400"></td>
+                            <td><input type="number" value="6"></td>
+                            <td>
+                                <a href="javascript:void(0)" onclick="deleteFee(this)" class="action-link">删除</a>
+                            </td>
+                        </tr>
+                        <tr class="subtotal">
+                            <td colspan="3">中国侧海运出口费用小计</td>
+                            <td>CNY</td>
+                            <td>1,400</td>
+                            <td colspan="2"></td>
+                        </tr>
+
+                        <!-- 国际海运费用组 -->
+                        <tr>
+                            <td rowspan="2">国际海运费用</td>
+                            <td>海运基本运费</td>
+                            <td>20GP</td>
+                            <td>
+                                <select>
+                                    <option value="USD" selected>USD</option>
+                                    <option value="CNY">CNY</option>
+                                </select>
+                            </td>
+                            <td><input type="number" value="2800"></td>
+                            <td><input type="number" value="0"></td>
+                            <td>
+                                <a href="javascript:void(0)" onclick="deleteFee(this)" class="action-link">删除</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>燃油附加费</td>
+                            <td>20GP</td>
+                            <td>
+                                <select>
+                                    <option value="USD" selected>USD</option>
+                                    <option value="CNY">CNY</option>
+                                </select>
+                            </td>
+                            <td><input type="number" value="350"></td>
+                            <td><input type="number" value="0"></td>
+                            <td>
+                                <a href="javascript:void(0)" onclick="deleteFee(this)" class="action-link">删除</a>
+                            </td>
+                        </tr>
+                        <tr class="subtotal">
+                            <td colspan="3">国际海运费用小计</td>
+                            <td>USD</td>
+                            <td>3,150</td>
+                            <td colspan="2"></td>
+                        </tr>
+
+                        <!-- 总计 -->
+                        <tr class="total">
+                            <td colspan="3">总计</td>
+                            <td colspan="4">
+                                CNY 1,400<br>
+                                USD 3,150
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            `;
+        }
+
+        // 添加报价费用
+        function addQuoteFee() {
+            // 这里应该打开费用选择弹窗
+            alert('添加费用功能待实现');
+        }
+
+        // 删除报价费用
+        function deleteFee(element) {
+            const row = element.closest('tr');
+            row.remove();
+        }
+
+        // 页面加载时初始化
+        window.onload = function() {
+            // 获取URL参数
+            const urlParams = new URLSearchParams(window.location.search);
+            const mode = urlParams.get('mode');
+            const id = urlParams.get('id');
+            
+            // 根据模式设置页面状态
+            if (mode === 'view') {
+                // 查看模式：禁用所有输入框和按钮
+                document.querySelectorAll('input, select, textarea').forEach(el => {
+                    el.disabled = true;
+                });
+                // 隐藏编辑相关按钮
+                document.querySelectorAll('.action-link, button[type="submit"]').forEach(el => {
+                    el.style.display = 'none';
+                });
+                // 显示生成订单按钮
+                document.getElementById('viewModeButtons').style.display = 'block';
+            }
+            
+            // 如果有ID参数，加载对应数据
+            if (id) {
+                loadQuotationData(id);
+            }
+
+            // 获取URL参数中的运价ID
+            const freightId = urlParams.get('freightId');
+            
+            // 如果有运价ID参数，自动选择该运价
+            if (freightId) {
+                // 自动调用选择运价函数
+                selectFreight(freightId);
+            }
+
+            // 生成并填充报价单号
+            document.getElementById('quotationNo').value = generateQuotationNo();
+            
+            // 设置默认日期
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('validFrom').value = today;
+            
+            // 设置默认截止日期（一年后）
+            const nextYear = new Date();
+            nextYear.setFullYear(nextYear.getFullYear() + 1);
+            document.getElementById('validTo').value = nextYear.toISOString().split('T')[0];
+
+            // 渲染费用表格
+            renderCostTable();
+            renderQuoteTable();
+        };
+
+        // 表单提交处理
+        document.getElementById('addQuotationForm').onsubmit = function(e) {
+            e.preventDefault();
+            
+            // 收集表单数据
+            const formData = {
+                quotationNo: document.getElementById('quotationNo').value,
+                customerName: document.getElementById('customerName').value,
+                validFrom: document.getElementById('validFrom').value,
+                validTo: document.getElementById('validTo').value
+            };
+            
+            console.log('提交的数据:', formData);
+            
+            // 显示成功消息并返回列表页
+            alert('报价单创建成功！');
+            window.location.href = 'quotation.html';
+        };
+
+        function openPreviewModal() {
+            document.getElementById('previewModal').style.display = 'block';
+        }
+
+        function closePreviewModal() {
+            document.getElementById('previewModal').style.display = 'none';
+        }
+
+        function exportPreview() {
+            alert('敬请期待');
+        }
+
+        // 点击模态框外部时关闭
+        window.onclick = function(event) {
+            const modal = document.getElementById('previewModal');
+            if (event.target == modal) {
+                closePreviewModal();
+            }
+        }
+
+        // 加载报价单数据
+        function loadQuotationData(id) {
+            // 模拟从服务器获取数据
+            const mockData = {
+                quotationNo: 'QT202403001',
+                customerName: '上海国际贸易有限公司',
+                agentName: '上海航运代理有限公司',
+                validFrom: '2024-03-01',
+                validTo: '2024-12-31',
+                tradeMode: 'FOB',
+                insuranceTerms: 'ICC-A',
+                pickupLocation: '上海',
+                deliveryLocation: '东京',
+                businessType: '海运',
+                cargoName: '电子产品',
+                hsCode: '8517.12.00',
+                description: '零部件',
+                packaging: ['纸箱', '托盘'],
+                quantity: 100,
+                grossWeight: 2000,
+                volume: 40,
+                chargeableWeight: 2000,
+                frequency: '每周'
+            };
+
+            // 填充表单数据
+            Object.keys(mockData).forEach(key => {
+                const element = document.getElementById(key);
+                if (element) {
+                    element.value = mockData[key];
+                }
+            });
+        }
+
+        // 生成订单相关函数
+        function generateOrder() {
+            document.getElementById('generateOrderModal').style.display = 'block';
+        }
+
+        function closeGenerateOrderModal() {
+            document.getElementById('generateOrderModal').style.display = 'none';
+        }
+
+        function confirmGenerateOrder() {
+            alert('订单生成成功！');
+            closeGenerateOrderModal();
+            // 这里可以添加跳转到订单页面的逻辑
+        }
+    </script>
+</body>
+</html> 

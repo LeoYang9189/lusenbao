@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>运价查询 - 运价报价管理系统</title>
+    <title>报价管理 - 运价报价管理系统</title>
     <style>
         /* 复用基础样式 */
         body {
@@ -92,6 +92,10 @@
             border-radius: 4px;
         }
         
+        .button-group {
+            margin: 16px 0;
+        }
+        
         .button {
             background: #1890ff;
             color: white;
@@ -148,11 +152,27 @@
             cursor: pointer;
             border-radius: 2px;
         }
+
+        /* 复选框样式 */
+        .data-table input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+        
+        /* 批量操作按钮样式 */
+        .button-group {
+            margin-bottom: 16px;
+        }
+        
+        .button-group .button {
+            margin-right: 8px;
+        }
     </style>
 </head>
 <body>
     <div class="navbar">
-        <h1>运价报价管理系统 - 运价查询</h1>
+        <h1>运价报价管理系统 - 报价管理</h1>
     </div>
     <div class="container">
         <div class="sidebar">
@@ -172,58 +192,46 @@
             <div class="search-bar">
                 <div class="search-form">
                     <div class="form-group">
-                        <label>费用组名称</label>
-                        <input type="text" placeholder="请输入费用组名称">
+                        <label>报价单号</label>
+                        <input type="text" placeholder="请输入报价单号">
                     </div>
                     <div class="form-group">
-                        <label>费用名称</label>
-                        <input type="text" placeholder="请输入费用名称">
-                    </div>
-                    <div class="form-group">
-                        <label>单位</label>
-                        <input type="text" placeholder="比如20GP或20OT的查询">
-                    </div>
-                    <div class="form-group">
-                        <label>起点</label>
-                        <input type="text" placeholder="请输入起点">
-                    </div>
-                    <div class="form-group">
-                        <label>终点</label>
-                        <input type="text" placeholder="请输入终点">
-                    </div>
-                    <div class="form-group">
-                        <label>规格</label>
-                        <input type="text" placeholder="请输入规格">
+                        <label>客户名称</label>
+                        <input type="text" placeholder="请输入客户名称">
                     </div>
                     <div class="form-group">
                         <label>代理名称</label>
                         <input type="text" placeholder="请输入代理名称">
                     </div>
-                    <div class="form-group">
-                        <label>运价编号</label>
-                        <input type="text" placeholder="请输入运价编号">
-                    </div>
-                    <div class="form-group">
-                        <label>有效期</label>
-                        <input type="date">
-                    </div>
                 </div>
-                <div style="text-align: right; margin-top: 16px;">
+                <div class="button-group">
                     <button class="button">搜索</button>
                     <button class="button secondary">重置</button>
                 </div>
+            </div>
+
+            <!-- 操作按钮组 -->
+            <div class="button-group">
+                <button type="button" class="button" onclick="batchApprove()">批量审核</button>
+                <button type="button" class="button" onclick="batchReject()">批量拒绝</button>
+                <button type="button" class="button" onclick="window.location.href='add-quotation.html'">新建报价单</button>
+                <button type="button" class="button secondary" onclick="copyQuotation()">复制报价单</button>
+                <button type="button" class="button secondary" onclick="exportQuotation()">导出报价单</button>
             </div>
 
             <!-- 数据表格 -->
             <table class="data-table">
                 <thead>
                     <tr>
+                        <th width="50">
+                            <input type="checkbox" id="checkAll" onclick="toggleCheckAll()">
+                        </th>
                         <th>ID</th>
-                        <th>运价编号</th>
-                        <th>起点</th>
-                        <th>终点</th>
+                        <th>报价单号</th>
+                        <th>客户名称</th>
                         <th>代理名称</th>
                         <th>有效期</th>
+                        <th>状态</th>
                         <th>创建人</th>
                         <th>创建时间</th>
                         <th>操作</th>
@@ -250,123 +258,153 @@
         const mockData = [
             {
                 id: 1,
-                freightNo: 'FR202403001',
-                startPoint: '上海',
-                endPoint: '东京',
+                quotationNo: 'QT202403001',
+                customerName: '上海国际贸易有限公司',
                 agentName: '上海航运代理有限公司',
                 validPeriod: '2024-03-01 至 2024-12-31',
+                status: '审核通过',
                 creator: '张三',
                 createTime: '2024-03-01 10:00:00'
             },
             {
                 id: 2,
-                freightNo: 'FR202403002',
-                startPoint: '深圳',
-                endPoint: '新加坡',
+                quotationNo: 'QT202403002',
+                customerName: '深圳电子科技有限公司',
                 agentName: '深圳国际物流有限公司',
                 validPeriod: '2024-03-01 至 2024-12-31',
+                status: '待审核',
                 creator: '李四',
                 createTime: '2024-03-01 11:30:00'
             },
             {
                 id: 3,
-                freightNo: 'FR202403003',
-                startPoint: '青岛',
-                endPoint: '釜山',
+                quotationNo: 'QT202403003',
+                customerName: '青岛进出口贸易公司',
                 agentName: '青岛港口物流有限公司',
                 validPeriod: '2024-03-01 至 2024-09-30',
+                status: '已拒绝',
                 creator: '王五',
                 createTime: '2024-03-01 14:20:00'
             },
             {
                 id: 4,
-                freightNo: 'FR202403004',
-                startPoint: '宁波',
-                endPoint: '洛杉矶',
+                quotationNo: 'QT202403004',
+                customerName: '宁波外贸集团',
                 agentName: '宁波外运物流公司',
                 validPeriod: '2024-03-01 至 2024-12-31',
+                status: '审核通过',
                 creator: '赵六',
                 createTime: '2024-03-01 15:45:00'
             },
             {
                 id: 5,
-                freightNo: 'FR202403005',
-                startPoint: '广州',
-                endPoint: '鹿特丹',
+                quotationNo: 'QT202403005',
+                customerName: '广州进出口贸易公司',
                 agentName: '广州海运集团',
                 validPeriod: '2024-03-01 至 2024-08-31',
+                status: '待审核',
                 creator: '孙七',
                 createTime: '2024-03-01 16:30:00'
             },
             {
                 id: 6,
-                freightNo: 'FR202403006',
-                startPoint: '厦门',
-                endPoint: '悉尼',
+                quotationNo: 'QT202403006',
+                customerName: '厦门外贸发展有限公司',
                 agentName: '厦门国际货运代理',
                 validPeriod: '2024-03-01 至 2024-12-31',
+                status: '待审核',
                 creator: '周八',
                 createTime: '2024-03-02 09:15:00'
             },
             {
                 id: 7,
-                freightNo: 'FR202403007',
-                startPoint: '天津',
-                endPoint: '汉堡',
+                quotationNo: 'QT202403007',
+                customerName: '天津港口贸易公司',
                 agentName: '天津航运物流有限公司',
                 validPeriod: '2024-03-01 至 2024-11-30',
+                status: '已拒绝',
                 creator: '吴九',
                 createTime: '2024-03-02 10:20:00'
             },
             {
                 id: 8,
-                freightNo: 'FR202403008',
-                startPoint: '大连',
-                endPoint: '温哥华',
+                quotationNo: 'QT202403008',
+                customerName: '大连国际贸易集团',
                 agentName: '大连港口物流公司',
                 validPeriod: '2024-03-01 至 2024-10-31',
+                status: '审核通过',
                 creator: '郑十',
                 createTime: '2024-03-02 11:40:00'
             },
             {
                 id: 9,
-                freightNo: 'FR202403009',
-                startPoint: '上海',
-                endPoint: '马尼拉',
-                agentName: '上海国际货运公司',
+                quotationNo: 'QT202403009',
+                customerName: '苏州电子制造有限公司',
+                agentName: '苏州国际货运公司',
                 validPeriod: '2024-03-01 至 2024-12-31',
+                status: '待审核',
                 creator: '张三',
                 createTime: '2024-03-02 13:20:00'
             },
             {
                 id: 10,
-                freightNo: 'FR202403010',
-                startPoint: '深圳',
-                endPoint: '曼谷',
-                agentName: '深圳海运物流公司',
+                quotationNo: 'QT202403010',
+                customerName: '杭州科技发展有限公司',
+                agentName: '杭州海运物流公司',
                 validPeriod: '2024-03-01 至 2024-12-31',
+                status: '审核通过',
                 creator: '李四',
                 createTime: '2024-03-02 14:45:00'
             },
             {
                 id: 11,
-                freightNo: 'FR202403011',
-                startPoint: '青岛',
-                endPoint: '迪拜',
-                agentName: '青岛国际物流集团',
+                quotationNo: 'QT202403011',
+                customerName: '武汉进出口贸易有限公司',
+                agentName: '武汉国际物流集团',
                 validPeriod: '2024-03-01 至 2024-12-31',
+                status: '待审核',
                 creator: '王五',
                 createTime: '2024-03-02 15:30:00'
             },
             {
                 id: 12,
-                freightNo: 'FR202403012',
-                startPoint: '宁波',
-                endPoint: '纽约',
-                agentName: '宁波港口航运公司',
+                quotationNo: 'QT202403012',
+                customerName: '成都外贸发展公司',
+                agentName: '成都物流航运公司',
                 validPeriod: '2024-03-01 至 2024-12-31',
+                status: '已拒绝',
                 creator: '赵六',
                 createTime: '2024-03-02 16:15:00'
+            },
+            {
+                id: 13,
+                quotationNo: 'QT202403013',
+                customerName: '重庆机械制造有限公司',
+                agentName: '重庆国际物流有限公司',
+                validPeriod: '2024-03-01 至 2024-12-31',
+                status: '审核通过',
+                creator: '孙七',
+                createTime: '2024-03-03 09:30:00'
+            },
+            {
+                id: 14,
+                quotationNo: 'QT202403014',
+                customerName: '西安电子科技有限公司',
+                agentName: '西安货运代理公司',
+                validPeriod: '2024-03-01 至 2024-12-31',
+                status: '待审核',
+                creator: '周八',
+                createTime: '2024-03-03 10:45:00'
+            },
+            {
+                id: 15,
+                quotationNo: 'QT202403015',
+                customerName: '郑州贸易发展有限公司',
+                agentName: '郑州物流运输公司',
+                validPeriod: '2024-03-01 至 2024-12-31',
+                status: '审核通过',
+                creator: '吴九',
+                createTime: '2024-03-03 11:20:00'
             }
         ];
 
@@ -377,31 +415,103 @@
             mockData.forEach(record => {
                 tbody.innerHTML += `
                     <tr>
+                        <td>
+                            <input type="checkbox" class="row-checkbox" value="${record.id}">
+                        </td>
                         <td>${record.id}</td>
-                        <td>${record.freightNo}</td>
-                        <td>${record.startPoint}</td>
-                        <td>${record.endPoint}</td>
+                        <td>${record.quotationNo}</td>
+                        <td>${record.customerName}</td>
                         <td>${record.agentName}</td>
                         <td>${record.validPeriod}</td>
+                        <td style="${getStatusStyle(record.status)}">${record.status}</td>
                         <td>${record.creator}</td>
                         <td>${record.createTime}</td>
                         <td>
-                            <a href="view-freight.html?id=${record.id}" class="action-link">查看</a>
-                            <a href="javascript:void(0)" onclick="generateQuotation(${record.id})" class="action-link">生成报价单</a>
+                            <a href="add-quotation.html?id=${record.id}&mode=view" class="action-link">查看</a>
+                            <a href="add-quotation.html?id=${record.id}&mode=edit" class="action-link">编辑</a>
+                            <a href="javascript:void(0)" class="action-link" onclick="deleteItem(${record.id})">删除</a>
                         </td>
                     </tr>
                 `;
             });
         };
 
-        function viewDetail(id) {
-            // 跳转到运价详情页，并传递ID参数
-            window.location.href = `view-freight.html?id=${id}`;
+        function deleteItem(id) {
+            if (confirm('确定要删除这条报价单记录吗？')) {
+                alert('删除成功！');
+                // 仅从页面上移除该行
+                const row = document.querySelector(`tr[data-id="${id}"]`);
+                if (row) {
+                    row.remove();
+                }
+            }
         }
 
-        function generateQuotation(freightId) {
-            // 可以将运价ID作为参数传递给新建报价单页面
-            window.location.href = `add-quotation.html?freightId=${freightId}`;
+        function copyQuotation() {
+            alert('复制报价单功能待实现');
+        }
+
+        function exportQuotation() {
+            alert('导出报价单功能待实现');
+        }
+
+        // 全选/取消全选
+        function toggleCheckAll() {
+            const checkAll = document.getElementById('checkAll');
+            const checkboxes = document.querySelectorAll('.row-checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = checkAll.checked;
+            });
+        }
+
+        // 获取选中的ID列表
+        function getSelectedIds() {
+            const checkboxes = document.querySelectorAll('.row-checkbox:checked');
+            return Array.from(checkboxes).map(checkbox => checkbox.value);
+        }
+
+        // 批量审核
+        function batchApprove() {
+            const selectedIds = getSelectedIds();
+            if (selectedIds.length === 0) {
+                alert('请选择要审核的报价单');
+                return;
+            }
+            if (confirm(`确定要审核选中的 ${selectedIds.length} 条报价单吗？`)) {
+                alert('审核成功！');
+                // 这里应该调用后端API进行实际的审核操作
+                // 刷新页面或更新状态
+                location.reload();
+            }
+        }
+
+        // 批量拒绝
+        function batchReject() {
+            const selectedIds = getSelectedIds();
+            if (selectedIds.length === 0) {
+                alert('请选择要拒绝的报价单');
+                return;
+            }
+            if (confirm(`确定要拒绝选中的 ${selectedIds.length} 条报价单吗？`)) {
+                alert('操作成功！');
+                // 这里应该调用后端API进行实际的拒绝操作
+                // 刷新页面或更新状态
+                location.reload();
+            }
+        }
+
+        // 获取状态样式的辅助函数
+        function getStatusStyle(status) {
+            switch(status) {
+                case '审核通过':
+                    return 'color: #52c41a;'; // 绿色
+                case '待审核':
+                    return 'color: #1890ff;'; // 蓝色
+                case '已拒绝':
+                    return 'color: #f5222d;'; // 红色
+                default:
+                    return '';
+            }
         }
     </script>
 </body>
