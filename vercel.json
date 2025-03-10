@@ -5,5 +5,13 @@
       "src": "*.html",
       "use": "@vercel/static"
     }
+  ],
+  "routes": [
+    { "src": "/", "dest": "/index.html" },
+    { "src": "/basic-data", "dest": "/basic-data.html" },
+    { "src": "/freight-maintenance", "dest": "/freight-maintenance.html" },
+    { "src": "/freight-query", "dest": "/freight-query.html" },
+    { "src": "/view-freight", "dest": "/view-freight.html" },
+    { "src": "/edit-freight", "dest": "/edit-freight.html" }
   ]
 } 

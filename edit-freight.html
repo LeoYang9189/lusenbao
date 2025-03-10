@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>编辑运价 - 运价报价管理系统</title>
+    <style>
+        /* 复用基础样式 */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+        .navbar {
+            background: #001529;
+            padding: 0 20px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            color: white;
+        }
+        .navbar h1 {
+            margin: 0;
+            font-size: 18px;
+        }
+        .container {
+            display: flex;
+            min-height: calc(100vh - 50px);
+        }
+        .sidebar {
+            width: 200px;
+            background: #001529;
+            padding: 20px 0;
+        }
+        .menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .menu li {
+            padding: 10px 20px;
+        }
+        .menu a {
+            color: #fff;
+            text-decoration: none;
+            display: block;
+        }
+        .menu a:hover {
+            color: #1890ff;
+        }
+        .content {
+            flex: 1;
+            padding: 20px;
+            background: #f0f2f5;
+            overflow: auto;
+        }
+
+        /* 表单容器 */
+        .form-container {
+            background: #fff;
+            border-radius: 4px;
+            padding: 24px;
+        }
+
+        .form-title {
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .form-title h2 {
+            margin: 0;
+        }
+
+        /* 模块样式 */
+        .module {
+            margin-bottom: 24px;
+            border: 1px solid #f0f0f0;
+            border-radius: 2px;
+        }
+
+        .module-title {
+            background: #fafafa;
+            padding: 12px 16px;
+            font-weight: 500;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .module-content {
+            padding: 16px;
+        }
+
+        /* 表单网格 */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        /* 按钮样式 */
+        .button-group {
+            margin-top: 24px;
+            text-align: center;
+        }
+
+        .button {
+            background: #1890ff;
+            color: white;
+            border: none;
+            padding: 8px 32px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 0 8px;
+        }
+
+        .button.secondary {
+            background: #fff;
+            color: #666;
+            border: 1px solid #d9d9d9;
+        }
+
+        /* 费用表格样式 */
+        .fee-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 16px;
+        }
+
+        .fee-table th,
+        .fee-table td {
+            padding: 12px;
+            border: 1px solid #f0f0f0;
+        }
+
+        .fee-table th {
+            background: #fafafa;
+            font-weight: 500;
+        }
+
+        .add-fee-button {
+            margin: 16px 0;
+        }
+
+        /* 调整费用名称多选框的宽度 */
+        .fee-table select[multiple] {
+            min-width: 150px;
+            height: 80px;
+        }
+
+        /* 调整数字输入框的宽度 */
+        .fee-table input[type="number"] {
+            min-width: 80px;
+        }
+
+        /* 调整费用组选择框的宽度 */
+        .fee-table select:not([multiple]) {
+            min-width: 150px;
+        }
+
+        /* 添加有效期区间的样式 */
+        .form-group input[type="date"] {
+            width: 150px;
+        }
+
+        /* 添加/修改模态框样式确保弹窗正常显示 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+        
+        .modal-content {
+            background-color: #fefefe;
+            margin: 10% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 50%;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .modal-title {
+            margin: 0;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #aaa;
+        }
+        
+        .modal-close:hover {
+            color: #000;
+        }
+        
+        .modal-body {
+            margin-bottom: 20px;
+        }
+        
+        .modal-footer {
+            border-top: 1px solid #eee;
+            padding-top: 10px;
+            text-align: right;
+        }
+        
+        /* 只读输入框样式 */
+        input[readonly] {
+            background-color: #f5f5f5;
+            color: #666;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h1>运价报价管理系统 - 编辑运价</h1>
+    </div>
+    <div class="container">
+        <div class="sidebar">
+            <ul class="menu">
+                <li><a href="basic-data.html">基础资料管理</a></li>
+                <li><a href="freight-maintenance.html">运价维护</a></li>
+                <li><a href="freight-query.html">运价查询</a></li>
+                <li><a href="quotation.html">报价管理</a></li>
+            </ul>
+        </div>
+        <div class="content">
+            <div style="background: #ffe58f; padding: 10px; margin-bottom: 15px; border-radius: 4px; font-weight: bold; color: #873800;">
+                ！！！只是概要的页面显示方案构想，最终实现效果需要细节确认之后再以实际为准
+            </div>
+            <div class="form-container">
+                <div class="form-title">
+                    <h2>编辑运价</h2>
+                </div>
+                <form id="editFreightForm">
+                    <!-- 基本信息模块 -->
+                    <div class="module">
+                        <div class="module-title">基本信息</div>
+                        <div class="module-content">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label>运价编号</label>
+                                    <input type="text" id="freightNo" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label>起点</label>
+                                    <input type="text" id="startPoint" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>终点</label>
+                                    <input type="text" id="endPoint" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>规格</label>
+                                    <input type="text" id="specification" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>代理名称</label>
+                                    <input type="text" id="agentName" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>有效期</label>
+                                    <div style="display: flex; align-items: center;">
+                                        <input type="date" id="validFrom" required>
+                                        <span style="margin: 0 8px;">至</span>
+                                        <input type="date" id="validTo" required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 费用信息模块 -->
+                    <div class="module">
+                        <div class="module-title">费用信息</div>
+                        <div class="module-content">
+                            <div id="feeTableContainer">
+                                <!-- 费用表格将在这里动态渲染 -->
+                            </div>
+                            <div class="add-fee-button">
+                                <button type="button" class="button" onclick="addFeeRow()">添加费用</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="button" class="button secondary" onclick="window.location.href='freight-maintenance.html'">返回</button>
+                        <button type="submit" class="button">保存更新</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加费用选择弹窗 -->
+    <div id="addFeeModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">添加费用</h3>
+                <button type="button" class="modal-close" onclick="closeModal('addFeeModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>费用组</label>
+                    <select id="feeGroupSelect" onchange="updateFeeNameOptions()">
+                        <!-- 动态填充费用组选项 -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>费用名称</label>
+                    <select id="feeNameSelect" multiple style="height: 120px; min-width: 200px;">
+                        <!-- 动态填充费用名称选项 -->
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="button secondary" onclick="closeModal('addFeeModal')">取消</button>
+                <button type="button" class="button" onclick="confirmAddFee()">确定</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 费用组和费用名称定义
+        const feeGroups = {
+            china_ocean_export: { label: '中国侧海运出口费用' },
+            china_ocean_import: { label: '中国侧海运进口费用' },
+            japan_ocean_export: { label: '日本侧海运出口费用' },
+            japan_ocean_import: { label: '日本侧海运进口费用' },
+            ocean_related: { label: '海运相关费用' },
+            air_related: { label: '空运相关费用' },
+            land_related: { label: '陆运相关费用' }
+        };
+
+        const feeNames = {
+            terminal_handling_charge: { label: '港口操作费', unit: '20GP', group: 'china_ocean_export' },
+            documentation_fee: { label: '文件费', unit: '票', group: 'china_ocean_export' },
+            delivery_order_fee: { label: '放货单费', unit: '票', group: 'japan_ocean_import' },
+            customs_clearance: { label: '清关费', unit: '票', group: 'ocean_related' },
+            delivery_fee: { label: '送货费', unit: '20GP', group: 'land_related' },
+            storage_fee: { label: '仓储费', unit: '天', group: 'ocean_related' },
+            inspection_fee: { label: '查验费', unit: '票', group: 'china_ocean_import' },
+            fumigation_fee: { label: '熏蒸费', unit: '票', group: 'china_ocean_export' },
+            ams_fee: { label: 'AMS费', unit: '票', group: 'ocean_related' },
+            demurrage_fee: { label: '滞箱费', unit: '天', group: 'ocean_related' },
+            detention_fee: { label: '滞车费', unit: '天', group: 'ocean_related' },
+            customs_duty: { label: '关税', unit: '票', group: 'china_ocean_import' },
+            vat: { label: '增值税', unit: '票', group: 'china_ocean_import' },
+            container_haulage: { label: '拖箱费', unit: '20GP', group: 'land_related' },
+            ocean_freight: { label: '海运费', unit: '20GP', group: 'ocean_related' },
+            trucking_fee: { label: '卡车运费', unit: '趟', group: 'land_related' },
+            packing_fee: { label: '包装费', unit: '件', group: 'ocean_related' }
+        };
+
+        // 定义运价数据
+        const freightData = {
+            "1": {
+                id: 1,
+                freightNo: 'FR202403001',
+                startPoint: '上海',
+                endPoint: '东京',
+                specification: '20GP, 40GP, 40HQ',
+                agentName: '上海航运代理有限公司',
+                validFrom: '2024-03-01',
+                validTo: '2024-12-31',
+                creator: '张三',
+                createTime: '2024-03-01 10:00:00',
+                fees: [
+                    { id: 101, feeGroup: 'china_ocean_export', feeNames: ['terminal_handling_charge'], unit: '20GP', currency: 'CNY', price: 1850, minPrice: 1850, taxRate: 6, suggestedPrice: 2000, suggestedTaxRate: 6 },
+                    { id: 102, feeGroup: 'china_ocean_export', feeNames: ['documentation_fee'], unit: '票', currency: 'CNY', price: 200, minPrice: 200, taxRate: 6, suggestedPrice: 250, suggestedTaxRate: 6 },
+                    { id: 103, feeGroup: 'ocean_related', feeNames: ['ocean_freight'], unit: '20GP', currency: 'USD', price: 1200, minPrice: 1100, taxRate: 0, suggestedPrice: 1350, suggestedTaxRate: 0 },
+                    { id: 104, feeGroup: 'japan_ocean_import', feeNames: ['delivery_order_fee'], unit: '票', currency: 'JPY', price: 25000, minPrice: 25000, taxRate: 10, suggestedPrice: 27000, suggestedTaxRate: 10 },
+                    { id: 105, feeGroup: 'land_related', feeNames: ['delivery_fee'], unit: '20GP', currency: 'JPY', price: 55000, minPrice: 55000, taxRate: 10, suggestedPrice: 60000, suggestedTaxRate: 10 },
+                    { id: 106, feeGroup: 'ocean_related', feeNames: ['customs_clearance'], unit: '票', currency: 'CNY', price: 350, minPrice: 350, taxRate: 6, suggestedPrice: 400, suggestedTaxRate: 6 },
+                    { id: 107, feeGroup: 'ocean_related', feeNames: ['fumigation_fee'], unit: '票', currency: 'CNY', price: 500, minPrice: 500, taxRate: 6, suggestedPrice: 550, suggestedTaxRate: 6 },
+                    { id: 108, feeGroup: 'land_related', feeNames: ['container_haulage'], unit: '20GP', currency: 'CNY', price: 1200, minPrice: 1200, taxRate: 6, suggestedPrice: 1350, suggestedTaxRate: 6 },
+                    { id: 109, feeGroup: 'china_ocean_import', feeNames: ['inspection_fee'], unit: '票', currency: 'CNY', price: 800, minPrice: 800, taxRate: 6, suggestedPrice: 850, suggestedTaxRate: 6 }
+                ]
+            },
+            "2": {
+                id: 2,
+                freightNo: 'FR202403002',
+                startPoint: '宁波',
+                endPoint: '大阪',
+                specification: '20GP, 40GP',
+                agentName: '宁波国际物流有限公司',
+                validFrom: '2024-03-01',
+                validTo: '2024-12-31',
+                creator: '李四',
+                createTime: '2024-03-01 11:30:00',
+                fees: [
+                    { id: 201, feeGroup: 'china_ocean_export', feeNames: ['terminal_handling_charge'], unit: '20GP', currency: 'CNY', price: 1800, minPrice: 1800, taxRate: 6, suggestedPrice: 1950, suggestedTaxRate: 6 },
+                    { id: 202, feeGroup: 'china_ocean_export', feeNames: ['documentation_fee'], unit: '票', currency: 'CNY', price: 180, minPrice: 180, taxRate: 6, suggestedPrice: 220, suggestedTaxRate: 6 },
+                    { id: 203, feeGroup: 'ocean_related', feeNames: ['ocean_freight'], unit: '20GP', currency: 'USD', price: 1100, minPrice: 1050, taxRate: 0, suggestedPrice: 1250, suggestedTaxRate: 0 },
+                    { id: 204, feeGroup: 'japan_ocean_import', feeNames: ['delivery_order_fee'], unit: '票', currency: 'JPY', price: 24000, minPrice: 24000, taxRate: 10, suggestedPrice: 26000, suggestedTaxRate: 10 },
+                    { id: 205, feeGroup: 'land_related', feeNames: ['delivery_fee'], unit: '20GP', currency: 'JPY', price: 52000, minPrice: 52000, taxRate: 10, suggestedPrice: 58000, suggestedTaxRate: 10 },
+                    { id: 206, feeGroup: 'ocean_related', feeNames: ['ams_fee'], unit: '票', currency: 'USD', price: 25, minPrice: 25, taxRate: 0, suggestedPrice: 35, suggestedTaxRate: 0 },
+                    { id: 207, feeGroup: 'ocean_related', feeNames: ['demurrage_fee'], unit: '天', currency: 'USD', price: 80, minPrice: 80, taxRate: 0, suggestedPrice: 100, suggestedTaxRate: 0 }
+                ]
+            }
+            // 可以继续添加更多运价数据
+        };
+
+        // 保存当前费用行
+        let feeRows = [];
+        let nextFeeId = 1000; // 用于生成新行的ID
+
+        // 从URL中获取运价ID
+        function getFreightIdFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('id') || '1'; // 如果没有id参数，默认使用1
+        }
+
+        // 根据ID获取运价详情
+        function getFreightDetailById(id) {
+            // 确保ID是字符串类型，因为URL参数始终是字符串
+            const strId = String(id);
+            return freightData[strId] || null;
+        }
+
+        // 渲染费用表格
+        function renderFeeTable() {
+            const container = document.getElementById('feeTableContainer');
+            if (feeRows.length === 0) {
+                container.innerHTML = '<p>请添加费用信息</p>';
+                return;
+            }
+
+            // 按费用组分组
+            const groupedRows = {};
+            feeRows.forEach(row => {
+                const groupId = row.feeGroup;
+                if (!groupedRows[groupId]) {
+                    groupedRows[groupId] = [];
+                }
+                groupedRows[groupId].push(row);
+            });
+
+            let html = `
+                <table class="fee-table">
+                    <thead>
+                        <tr>
+                            <th>费用组</th>
+                            <th>费用名称</th>
+                            <th>计费单位</th>
+                            <th>币种</th>
+                            <th>含税价</th>
+                            <th>Min.</th>
+                            <th>税率(%)</th>
+                            <th>建议报价</th>
+                            <th>报价税率(%)</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            Object.entries(groupedRows).forEach(([groupId, rows]) => {
+                const groupLabel = feeGroups[groupId]?.label || '';
+                
+                rows.forEach((row, index) => {
+                    // 只有每组的第一行显示费用组
+                    const groupCell = index === 0 ? `<td rowspan="${rows.length}">${groupLabel}</td>` : '';
+                    
+                    // 显示费用名称文本，而非复选框
+                    const feeNamesList = row.feeNames.map(name => feeNames[name]?.label || name).join(', ');
+                    
+                    html += `
+                        <tr data-id="${row.id}" data-group="${row.feeGroup}">
+                            ${groupCell}
+                            <td>${feeNamesList}</td>
+                            <td>
+                                <input type="text" name="unit_${row.id}" value="${row.unit || ''}" readonly>
+                            </td>
+                            <td>
+                                <select name="currency_${row.id}">
+                                    <option value="CNY" ${row.currency === 'CNY' ? 'selected' : ''}>CNY</option>
+                                    <option value="USD" ${row.currency === 'USD' ? 'selected' : ''}>USD</option>
+                                    <option value="JPY" ${row.currency === 'JPY' ? 'selected' : ''}>JPY</option>
+                                    <option value="EUR" ${row.currency === 'EUR' ? 'selected' : ''}>EUR</option>
+                                </select>
+                            </td>
+                            <td>
+                                <input type="number" name="price_${row.id}" value="${row.price || ''}">
+                            </td>
+                            <td>
+                                <input type="number" name="minPrice_${row.id}" value="${row.minPrice || ''}">
+                            </td>
+                            <td>
+                                <input type="number" name="taxRate_${row.id}" min="0" max="100" value="${row.taxRate || ''}">
+                            </td>
+                            <td>
+                                <input type="number" name="suggestedPrice_${row.id}" value="${row.suggestedPrice || ''}">
+                            </td>
+                            <td>
+                                <input type="number" name="suggestedTaxRate_${row.id}" min="0" max="100" value="${row.suggestedTaxRate || ''}">
+                            </td>
+                            <td>
+                                <button type="button" onclick="deleteFeeRow(${row.id})">删除</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            });
+
+            html += `
+                    </tbody>
+                </table>
+            `;
+            container.innerHTML = html;
+        }
+
+        // 添加新的费用行 - 打开弹窗
+        function addFeeRow() {
+            console.log("打开添加费用弹窗");
+            
+            // 填充费用组选项
+            const feeGroupSelect = document.getElementById('feeGroupSelect');
+            feeGroupSelect.innerHTML = '';
+            Object.entries(feeGroups).forEach(([key, group]) => {
+                feeGroupSelect.innerHTML += `<option value="${key}">${group.label}</option>`;
+            });
+            
+            // 初始化费用名称选项
+            updateFeeNameOptions();
+            
+            // 显示弹窗
+            const modal = document.getElementById('addFeeModal');
+            modal.style.display = 'block';
+            
+            console.log("弹窗应该已显示");
+        }
+        
+        // 根据选择的费用组更新费用名称选项
+        function updateFeeNameOptions() {
+            const groupId = document.getElementById('feeGroupSelect').value;
+            const feeNameSelect = document.getElementById('feeNameSelect');
+            
+            feeNameSelect.innerHTML = '';
+            Object.entries(feeNames)
+                .filter(([_, fee]) => fee.group === groupId)
+                .forEach(([key, fee]) => {
+                    feeNameSelect.innerHTML += `<option value="${key}">${fee.label}</option>`;
+                });
+        }
+        
+        // 修改确认添加费用函数，支持多选费用名称
+        function confirmAddFee() {
+            const groupId = document.getElementById('feeGroupSelect').value;
+            const feeNameSelect = document.getElementById('feeNameSelect');
+            
+            // 获取所有选中的费用名称
+            const selectedFeeNames = Array.from(feeNameSelect.selectedOptions).map(option => option.value);
+            
+            if (selectedFeeNames.length === 0) {
+                alert('请至少选择一个费用名称');
+                return;
+            }
+            
+            // 获取第一个费用名称的计费单位作为默认单位
+            const firstFeeName = feeNames[selectedFeeNames[0]];
+            const unit = firstFeeName ? firstFeeName.unit || '' : '';
+            
+            const id = nextFeeId++;
+            feeRows.push({
+                id: id,
+                feeGroup: groupId,
+                feeNames: selectedFeeNames, // 使用所有选中的费用名称
+                unit: unit,
+                currency: 'CNY',
+                price: '',
+                minPrice: '',
+                taxRate: '',
+                suggestedPrice: '',
+                suggestedTaxRate: ''
+            });
+            
+            renderFeeTable();
+            closeModal('addFeeModal');
+        }
+        
+        // 关闭弹窗
+        function closeModal(modalId) {
+            console.log("关闭弹窗:", modalId);
+            const modal = document.getElementById(modalId);
+            modal.style.display = 'none';
+        }
+
+        // 删除费用行
+        function deleteFeeRow(id) {
+            feeRows = feeRows.filter(row => row.id !== id);
+            renderFeeTable();
+        }
+
+        // 页面加载时初始化
+        window.onload = function() {
+            // 尝试从URL获取ID
+            const freightId = getFreightIdFromUrl();
+            // 获取对应的运价详情，如果不存在就使用默认的示例数据
+            let freightDetail = getFreightDetailById(freightId);
+            
+            // 如果找不到数据，使用默认示例数据（ID=1）
+            if (!freightDetail) {
+                freightDetail = freightData["1"];
+            }
+            
+            // 填充基本信息
+            document.getElementById('freightNo').value = freightDetail.freightNo;
+            document.getElementById('startPoint').value = freightDetail.startPoint;
+            document.getElementById('endPoint').value = freightDetail.endPoint;
+            document.getElementById('specification').value = freightDetail.specification;
+            document.getElementById('agentName').value = freightDetail.agentName;
+            document.getElementById('validFrom').value = freightDetail.validFrom;
+            document.getElementById('validTo').value = freightDetail.validTo;
+            
+            // 填充费用信息
+            feeRows = JSON.parse(JSON.stringify(freightDetail.fees)); // 深拷贝
+            renderFeeTable();
+        };
+
+        // 提交表单
+        document.getElementById('editFreightForm').onsubmit = function(e) {
+            e.preventDefault();
+            
+            // 收集表单数据
+            const formData = {
+                freightNo: document.getElementById('freightNo').value,
+                startPoint: document.getElementById('startPoint').value,
+                endPoint: document.getElementById('endPoint').value,
+                specification: document.getElementById('specification').value,
+                agentName: document.getElementById('agentName').value,
+                validFrom: document.getElementById('validFrom').value,
+                validTo: document.getElementById('validTo').value,
+                fees: feeRows
+            };
+            
+            console.log('提交的数据:', formData);
+            
+            // 显示成功消息并返回列表页
+            alert('运价更新成功！');
+            window.location.href = 'freight-maintenance.html';
+        };
+    </script>
+</body>
+</html> 
