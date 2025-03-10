@@ -164,17 +164,24 @@
             </ul>
         </div>
         <div class="content">
-            <!-- 公告 -->
-            <div class="notice">
-                以下内容为改造Cargoware运价管理模块，单独拿出来放在方案中是为了方便展示
+            <div style="background: #ffe58f; padding: 10px; margin-bottom: 15px; border-radius: 4px; font-weight: bold; color: #873800;">
+                ！！！只是概要的页面显示方案构想，最终实现效果需要细节确认之后再以实际为准
             </div>
 
             <!-- 搜索栏 -->
             <div class="search-bar">
                 <div class="search-form">
                     <div class="form-group">
-                        <label>运价编号</label>
-                        <input type="text" placeholder="请输入运价编号">
+                        <label>费用组名称</label>
+                        <input type="text" placeholder="请输入费用组名称">
+                    </div>
+                    <div class="form-group">
+                        <label>费用名称</label>
+                        <input type="text" placeholder="请输入费用名称">
+                    </div>
+                    <div class="form-group">
+                        <label>单位</label>
+                        <input type="text" placeholder="比如20GP或20OT的查询">
                     </div>
                     <div class="form-group">
                         <label>起点</label>
@@ -185,8 +192,16 @@
                         <input type="text" placeholder="请输入终点">
                     </div>
                     <div class="form-group">
+                        <label>规格</label>
+                        <input type="text" placeholder="请输入规格">
+                    </div>
+                    <div class="form-group">
                         <label>代理名称</label>
                         <input type="text" placeholder="请输入代理名称">
+                    </div>
+                    <div class="form-group">
+                        <label>运价编号</label>
+                        <input type="text" placeholder="请输入运价编号">
                     </div>
                     <div class="form-group">
                         <label>有效期</label>
@@ -271,7 +286,8 @@
         };
 
         function viewDetail(id) {
-            alert('查看运价详情：' + id);
+            // 跳转到运价详情页，并传递ID参数
+            window.location.href = `view-freight.html?id=${id}`;
         }
 
         function generateQuotation(id) {
